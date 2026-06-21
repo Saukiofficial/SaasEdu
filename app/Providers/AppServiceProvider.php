@@ -25,6 +25,10 @@ use App\Repositories\Contracts\InvoiceRepositoryInterface;
 use App\Repositories\InvoiceRepository;
 use App\Repositories\Contracts\PaymentRepositoryInterface;
 use App\Repositories\PaymentRepository;
+use App\Repositories\Contracts\StudyMaterialRepositoryInterface;
+use App\Repositories\StudyMaterialRepository;
+use App\Repositories\Contracts\ExamRepositoryInterface;
+use App\Repositories\ExamRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -41,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(GradeRepositoryInterface::class, GradeRepository::class);
         $this->app->bind(InvoiceRepositoryInterface::class, InvoiceRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
+        $this->app->bind(StudyMaterialRepositoryInterface::class, StudyMaterialRepository::class);
+        $this->app->bind(ExamRepositoryInterface::class, ExamRepository::class);
     }
 
     public function boot(): void

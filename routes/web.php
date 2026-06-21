@@ -14,6 +14,9 @@ use App\Http\Controllers\Academic\GradeController;
 use App\Http\Controllers\Academic\ReportCardController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
+use App\Http\Controllers\Lms\StudyMaterialController;
+use App\Http\Controllers\Lms\ExamController;
+use App\Http\Controllers\SuperAdmin\TenantController; // Import Controller Super Admin
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -36,6 +39,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', function () { return Inertia::render('Dashboard'); })->name('dashboard');
 
+    // --- SUPER ADMIN ROUTES ---
+    Route::prefix('super-admin')->name('super-admin.')->group(function () {
+        Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+    });
+
+    // --- TENANT (SCHOOL) ROUTES ---
     // Group Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {
         Route::resource('academic-years', AcademicYearController::class)->except(['create', 'show', 'edit']);
@@ -67,4 +76,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.store');
     Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+
+    // Modul LMS (E-Learning)
+    Route::resource('study-materials', StudyMaterialController::class)->except(['create', 'show', 'edit']); 
+    Route::resource('exams', ExamController::class)->except(['create', 'show', 'edit']);
 });

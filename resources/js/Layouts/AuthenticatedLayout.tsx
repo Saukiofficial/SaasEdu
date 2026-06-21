@@ -12,7 +12,11 @@ import {
     ClipboardList,
     Award, 
     Printer, 
-    Banknote, // <-- Tambahkan icon ini
+    Banknote, 
+    MonitorPlay, 
+    FileQuestion,
+    Building, // Icon untuk Super Admin
+    CreditCard, // Icon untuk Super Admin
     LogOut, 
     Menu, 
     X, 
@@ -28,13 +32,25 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
     
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Daftar Menu Navigasi Diperbarui
-    const navigation = [
+    // Cek apakah user adalah Super Admin (SaaS Owner)
+    const isSuperAdmin = user.school_id === null;
+
+    // Daftar Menu Khusus Super Admin (Pemilik Aplikasi)
+    const superAdminNavigation = [
+        { name: 'Dashboard SaaS', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'Daftar Klien / Tenant', href: '/super-admin/tenants', icon: Building },
+        { name: 'Paket Langganan', href: '#', icon: CreditCard },
+    ];
+
+    // Daftar Menu Khusus Klien (Pihak Sekolah)
+    const schoolNavigation = [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'PPDB Masuk', href: '/admin/ppdb', icon: UsersRound },
         { name: 'Data Siswa', href: '/students', icon: GraduationCap },
         { name: 'Data Guru', href: '/teachers', icon: BriefcaseBusiness }, 
-        { name: 'Keuangan / SPP', href: '/invoices', icon: Banknote }, // <-- Menu Baru Keuangan
+        { name: 'Keuangan / SPP', href: '/invoices', icon: Banknote }, 
+        { name: 'LMS & Tugas', href: '/study-materials', icon: MonitorPlay },
+        { name: 'Ujian Online', href: '/exams', icon: FileQuestion },
         { name: 'Jadwal Pelajaran', href: '/schedules', icon: CalendarClock }, 
         { name: 'Absensi Siswa', href: '/attendances', icon: ClipboardList },
         { name: 'Input Nilai', href: '/grades', icon: Award },
@@ -43,6 +59,9 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         { name: 'Mata Pelajaran', href: '/master-data/subjects', icon: BookOpen },
         { name: 'Kelas & Ruangan', href: '/master-data/classrooms', icon: School },
     ];
+
+    // Tentukan menu mana yang dirender
+    const navigation = isSuperAdmin ? superAdminNavigation : schoolNavigation;
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
@@ -56,7 +75,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                 
                 <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                     {navigation.map((item) => {
-                        const isActive = url.startsWith(item.href);
+                        const isActive = url.startsWith(item.href) && item.href !== '#';
                         return (
                             <Link
                                 key={item.name}
@@ -76,12 +95,12 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
 
                 <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                     <div className="flex items-center mb-4 px-2">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold mr-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold mr-3 shrink-0">
                             {user.name.charAt(0)}
                         </div>
                         <div className="overflow-hidden">
                             <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user.name}</p>
-                            <p className="text-xs text-slate-500 truncate">{user.school ? user.school.name : 'Super Admin'}</p>
+                            <p className="text-xs text-slate-500 truncate">{isSuperAdmin ? 'SaaS Founder' : (user.school ? user.school.name : 'Unknown')}</p>
                         </div>
                     </div>
                     <Link href="/logout" method="post" as="button" className="w-full">
@@ -109,7 +128,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                         </div>
                         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
                             {navigation.map((item) => {
-                                const isActive = url.startsWith(item.href);
+                                const isActive = url.startsWith(item.href) && item.href !== '#';
                                 return (
                                     <Link key={item.name} href={item.href} className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium ${isActive ? 'bg-blue-50 text-blue-700' : 'text-slate-600'}`}>
                                         <item.icon className="w-5 h-5 mr-3" />
