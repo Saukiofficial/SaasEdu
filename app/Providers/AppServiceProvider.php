@@ -29,6 +29,12 @@ use App\Repositories\Contracts\StudyMaterialRepositoryInterface;
 use App\Repositories\StudyMaterialRepository;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use App\Repositories\ExamRepository;
+use App\Repositories\Contracts\SubscriptionPackageRepositoryInterface;
+use App\Repositories\SubscriptionPackageRepository; 
+use App\Repositories\Contracts\AnnouncementRepositoryInterface;
+use App\Repositories\AnnouncementRepository;
+use App\Repositories\Contracts\TicketRepositoryInterface;
+use App\Repositories\TicketRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,6 +53,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
         $this->app->bind(StudyMaterialRepositoryInterface::class, StudyMaterialRepository::class);
         $this->app->bind(ExamRepositoryInterface::class, ExamRepository::class);
+        $this->app->bind(SubscriptionPackageRepositoryInterface::class, SubscriptionPackageRepository::class);
+        $this->app->bind(AnnouncementRepositoryInterface::class, AnnouncementRepository::class);
+        $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
     }
 
     public function boot(): void

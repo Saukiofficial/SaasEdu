@@ -16,11 +16,33 @@ class TenantController extends Controller
             abort(403, 'Anda bukan Super Admin.');
         }
 
-        // Ambil semua data sekolah beserta jumlah akun usernya
-        $tenants = School::withCount('users')->latest()->paginate(10);
+        // Ambil semua data sekolah beserta jumlah akun usernya, dan data langganan terakhir
+        $tenants = School::withCount('users')
+            ->with('latestSubscription') // Ambil relasi langganan untuk info paket
+            ->latest()
+            ->paginate(15);
 
         return Inertia::render('SuperAdmin/Tenants/Index', [
             'tenants' => $tenants
         ]);
+    }
+
+    public function updateStatus(Request $request, string $id)
+    {
+        // Proteksi Super Admin
+        if (auth()->user()->school_id !== null) {
+            abort(403, 'Anda bukan Super Admin.');
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:active,suspended',
+        ]);
+
+        $school = School::findOrFail($id);
+        $school->update(['status' => $validated['status']]);
+
+        $statusText = $validated['status'] === 'active' ? 'diaktifkan' : 'disuspend';
+
+        return redirect()->back()->with('message', "Status tenant {$school->name} berhasil {$statusText}.");
     }
 }

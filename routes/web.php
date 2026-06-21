@@ -16,7 +16,6 @@ use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Lms\StudyMaterialController;
 use App\Http\Controllers\Lms\ExamController;
-use App\Http\Controllers\SuperAdmin\TenantController; // Import Controller Super Admin
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,10 +40,25 @@ Route::middleware('auth')->group(function () {
 
     // --- SUPER ADMIN ROUTES ---
     Route::prefix('super-admin')->name('super-admin.')->group(function () {
-        Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+        Route::get('/tenants', [\App\Http\Controllers\SuperAdmin\TenantController::class, 'index'])->name('tenants.index');
+        Route::put('/tenants/{tenant}/status', [\App\Http\Controllers\SuperAdmin\TenantController::class, 'updateStatus'])->name('tenants.update-status');
+        
+        Route::resource('packages', \App\Http\Controllers\SuperAdmin\PackageController::class)->except(['create', 'show', 'edit']);
+        Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class)->only(['index', 'destroy']);
+        Route::resource('announcements', \App\Http\Controllers\SuperAdmin\AnnouncementController::class)->except(['create', 'show', 'edit']);
+        
+        Route::get('/finance', [\App\Http\Controllers\SuperAdmin\FinanceController::class, 'index'])->name('finance.index');
+        Route::put('/finance/{subscription}/status', [\App\Http\Controllers\SuperAdmin\FinanceController::class, 'updateStatus'])->name('finance.update-status');
+        
+        // Tambahkan baris ini untuk Modul Laporan & Analitik SaaS
+        Route::get('/reports', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'index'])->name('reports.index');
+
+        Route::get('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'update'])->name('settings.update');
+
+        Route::resource('tickets', \App\Http\Controllers\SuperAdmin\TicketController::class)->only(['index', 'update', 'destroy']);
     });
 
-    // --- TENANT (SCHOOL) ROUTES ---
     // Group Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {
         Route::resource('academic-years', AcademicYearController::class)->except(['create', 'show', 'edit']);
