@@ -16,10 +16,11 @@ use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Lms\StudyMaterialController;
 use App\Http\Controllers\Lms\ExamController;
+use App\Http\Controllers\FrontendController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () { return Inertia::render('Welcome'); });
+Route::get('/', [FrontendController::class, 'welcome'])->name('home');
 
 // --- PUBLIC ROUTES ---
 Route::get('/ppdb/{school}', [PPDBController::class, 'showLanding'])->name('ppdb.landing');
@@ -59,9 +60,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'update'])->name('settings.update');
 
         Route::resource('tickets', \App\Http\Controllers\SuperAdmin\TicketController::class)->only(['index', 'update', 'destroy']);
-
+            
+        // --- CRM & SALES ---
         Route::resource('leads', \App\Http\Controllers\SuperAdmin\LeadController::class)->only(['index', 'store', 'destroy']);
         Route::put('leads/{lead}/status', [\App\Http\Controllers\SuperAdmin\LeadController::class, 'updateStatus'])->name('leads.update-status');
+        Route::get('demo-requests', [\App\Http\Controllers\SuperAdmin\DemoRequestController::class, 'index'])->name('demo-requests.index');
+        Route::put('demo-requests/{demoRequest}/status', [\App\Http\Controllers\SuperAdmin\DemoRequestController::class, 'updateStatus'])->name('demo-requests.update-status');
+        Route::delete('demo-requests/{demoRequest}', [\App\Http\Controllers\SuperAdmin\DemoRequestController::class, 'destroy'])->name('demo-requests.destroy');
+        Route::get('prospects', [\App\Http\Controllers\SuperAdmin\ProspectController::class, 'index'])->name('prospects.index');
+        Route::put('prospects/{prospect}/status', [\App\Http\Controllers\SuperAdmin\ProspectController::class, 'updateStatus'])->name('prospects.update-status');
+        Route::delete('prospects/{prospect}', [\App\Http\Controllers\SuperAdmin\ProspectController::class, 'destroy'])->name('prospects.destroy');
 
         // --- SUBSCRIPTION & BILLING Module ---
         Route::resource('trials', \App\Http\Controllers\SuperAdmin\TrialController::class)->only(['index', 'store', 'destroy']);
@@ -72,6 +80,9 @@ Route::middleware('auth')->group(function () {
         Route::put('subscription-invoices/{invoice}/pay', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'markAsPaid'])->name('subscription-invoices.pay');
         Route::put('subscription-invoices/{invoice}/cancel', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'cancel'])->name('subscription-invoices.cancel');
 
+        Route::get('refunds', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'index'])->name('refunds.index');
+Route::put('refunds/{refund}/status', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'updateStatus'])->name('refunds.update-status');
+Route::delete('refunds/{refund}', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'destroy'])->name('refunds.destroy');
 
         // --- TENANT MANAGEMENT Module ---
         Route::get('tenant-settings', [\App\Http\Controllers\SuperAdmin\TenantSettingController::class, 'index'])->name('tenant-settings.index');
@@ -85,6 +96,17 @@ Route::middleware('auth')->group(function () {
         // --- CONTENT MANAGEMENT Module ---
         Route::resource('faqs', \App\Http\Controllers\SuperAdmin\FaqController::class)->except(['create', 'show', 'edit']);
         Route::resource('announcements', \App\Http\Controllers\SuperAdmin\AnnouncementController::class)->except(['create', 'show', 'edit']);
+        Route::get('/landing-page', [\App\Http\Controllers\SuperAdmin\LandingPageController::class, 'index'])->name('landing-page.index');
+        Route::post('/landing-page', [\App\Http\Controllers\SuperAdmin\LandingPageController::class, 'update'])->name('landing-page.update');
+        Route::get('blogs', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'index'])->name('blogs.index');
+        Route::post('blogs', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'store'])->name('blogs.store');
+        Route::put('blogs/{blog}', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'update'])->name('blogs.update');
+        Route::delete('blogs/{blog}', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'destroy'])->name('blogs.destroy');
+
+
+        // --- SECURITY CENTER Module ---
+        Route::get('audit-logs', [\App\Http\Controllers\SuperAdmin\AuditLogController::class, 'index'])->name('audit-logs.index');
+
 
 
     });

@@ -61,6 +61,16 @@ use App\Repositories\Contracts\AddonRepositoryInterface;
 use App\Repositories\AddonRepository;
 use App\Repositories\Contracts\SubscriptionInvoiceRepositoryInterface;
 use App\Repositories\SubscriptionInvoiceRepository;
+use App\Repositories\Contracts\AuditLogRepositoryInterface;
+use App\Repositories\AuditLogRepository;
+use App\Repositories\Contracts\DemoRequestRepositoryInterface;
+use App\Repositories\DemoRequestRepository;
+use App\Repositories\Contracts\ProspectRepositoryInterface;
+use App\Repositories\ProspectRepository;
+use App\Repositories\Contracts\RefundRepositoryInterface;
+use App\Repositories\RefundRepository;
+use App\Repositories\Contracts\BlogRepositoryInterface;
+use App\Repositories\BlogRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -95,7 +105,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StaffRepositoryInterface::class, StaffRepository::class);
         $this->app->bind(AddonRepositoryInterface::class, AddonRepository::class);
         $this->app->bind(SubscriptionInvoiceRepositoryInterface::class, SubscriptionInvoiceRepository::class);
-
+        $this->app->bind(AuditLogRepositoryInterface::class, AuditLogRepository::class);
+        $this->app->bind(DemoRequestRepositoryInterface::class, DemoRequestRepository::class);
+        $this->app->bind(ProspectRepositoryInterface::class, ProspectRepository::class);
+        $this->app->bind(RefundRepositoryInterface::class, RefundRepository::class);
+        $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
     }
 
     public function boot(): void

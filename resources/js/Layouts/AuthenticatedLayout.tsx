@@ -65,7 +65,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                 { name: 'Addons', href: '/super-admin/addons', icon: Puzzle },
                 { name: 'Invoice', href: '/super-admin/subscription-invoices', icon: FileText },
                 { name: 'Payment', href: '/super-admin/finance', icon: CreditCard },
-                { name: 'Refund', href: '#', icon: RotateCcw },
+                { name: 'Refund', href: '/super-admin/refunds', icon: RotateCcw },
                 { name: 'Trial', href: '/super-admin/trials', icon: Clock },
             ]
         },
@@ -73,15 +73,15 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
             title: 'CRM & SALES',
             items: [
                 { name: 'Leads', href: '/super-admin/leads', icon: Target },
-                { name: 'Prospects', href: '#', icon: UserPlus },
-                { name: 'Demo Request', href: '#', icon: MonitorPlay },
+                { name: 'Prospects', href: '/super-admin/prospects', icon: UserPlus },
+                { name: 'Demo Request', href: '/super-admin/demo-requests', icon: MonitorPlay },
             ]
         },
         {
             title: 'CONTENT MANAGEMENT',
             items: [
-                { name: 'Landing Page', href: '#', icon: LayoutTemplate },
-                { name: 'Blog', href: '#', icon: FileEdit },
+                { name: 'Landing Page', href: '/super-admin/landing-page', icon: LayoutTemplate },
+                { name: 'Blog', href: '/super-admin/blogs', icon: FileEdit },
                 { name: 'FAQ', href: '/super-admin/faqs', icon: HelpCircle },
                 { name: 'Broadcast', href: '/super-admin/announcements', icon: Megaphone },
             ]
@@ -103,7 +103,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         {
             title: 'SECURITY CENTER',
             items: [
-                { name: 'Audit Log', href: '#', icon: ShieldAlert },
+                { name: 'Audit Log', href: '/super-admin/audit-logs', icon: ShieldAlert },
                 { name: 'Login Activity', href: '#', icon: Key },
                 { name: 'IP Access', href: '#', icon: Globe },
             ]
