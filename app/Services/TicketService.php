@@ -3,32 +3,43 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\TicketRepositoryInterface;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
-class TicketService extends BaseService
+class TicketService
 {
-    protected TicketRepositoryInterface $ticketRepository;
+    protected $ticketRepo;
 
-    public function __construct(TicketRepositoryInterface $ticketRepository)
+    public function __construct(TicketRepositoryInterface $ticketRepo)
     {
-        $this->ticketRepository = $ticketRepository;
+        $this->ticketRepo = $ticketRepo;
     }
 
-    public function getAllTickets(array $filters = [])
+    public function getAllTickets(int $perPage = 10)
     {
-        return $this->ticketRepository->getPaginatedTickets(15, $filters);
+        return $this->ticketRepo->getAllPaginatedWithSchool($perPage);
     }
 
-    public function respondToTicket(string $id, array $data)
+    public function updateTicketStatus(string $id, string $status)
     {
-        return $this->ticketRepository->update($id, [
-            'admin_response' => $data['admin_response'],
-            'status' => $data['status']
-        ]);
+        DB::beginTransaction();
+        try {
+            $ticket = $this->ticketRepo->updateStatus($id, $status);
+            
+            // TODO: (Opsional) Kirim notifikasi/email ke admin sekolah bahwa status tiket berubah
+            
+            DB::commit();
+            return $ticket;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating ticket status: ' . $e->getMessage());
+            throw $e;
+        }
     }
-    
+
     public function deleteTicket(string $id)
     {
-        return $this->ticketRepository->delete($id);
+        return $this->ticketRepo->delete($id);
     }
 }

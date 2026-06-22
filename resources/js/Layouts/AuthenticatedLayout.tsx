@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import {
-    LayoutDashboard, Building, UsersRound, Package, CreditCard, Megaphone,
-    PieChart, Settings, HeadphonesIcon, GraduationCap, BriefcaseBusiness,
-    School, BookOpen, CalendarDays, CalendarClock, ClipboardList, MonitorPlay,
-    FileQuestion, Award, Printer, Banknote, LogOut, Menu, X, Bell, Search,
-    MessageSquare, ChevronDown, Calendar, ShieldCheck
+    LayoutDashboard, Building, Globe, Sliders, ToggleRight, Users, 
+    UserCheck, Shield, Package, Puzzle, FileText, CreditCard, RotateCcw, 
+    Clock, Target, UserPlus, MonitorPlay, LayoutTemplate, FileEdit, 
+    HelpCircle, Megaphone, PieChart, Activity, HeadphonesIcon, BookOpen, 
+    ShieldAlert, Key, Link as LinkIcon, HardDrive, DatabaseBackup, Database, 
+    Code, Webhook, AlertTriangle, Settings, Palette, Languages,
+    School, UsersRound, GraduationCap, BriefcaseBusiness, CalendarDays, 
+    CalendarClock, ClipboardList, FileQuestion, Award, Printer, Banknote, 
+    LogOut, Menu, X, Bell, Search, MessageSquare, ChevronDown, Calendar, 
+    ShieldCheck, Mail, CheckCircle2, Edit
 } from 'lucide-react';
 
 export default function AuthenticatedLayout({ children, header }: { children: React.ReactNode, header?: string }) {
@@ -28,58 +33,176 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isSuperAdmin = user.school_id === null;
 
-    // --- MENU SUPER ADMIN (FITUR ASLI) ---
+    // --- MENU SUPER ADMIN ---
     const superAdminGroups = [
         {
-            title: 'Manajemen',
+            title: 'DASHBOARD',
             items: [
-                { name: 'Dashboard Global', href: '/dashboard', icon: LayoutDashboard },
-                { name: 'Manajemen Tenant', href: '/super-admin/tenants', icon: Building },
-                { name: 'Manajemen User', href: '/super-admin/users', icon: UsersRound },
-                { name: 'Manajemen Paket', href: '/super-admin/packages', icon: Package },
+                { name: 'Dashboard Utama', href: '/dashboard', icon: LayoutDashboard },
             ]
         },
         {
-            title: 'Sistem',
+            title: 'TENANT MANAGEMENT',
             items: [
-                { name: 'Pembayaran & Keuangan', href: '/super-admin/finance', icon: CreditCard },
-                { name: 'Konten & Pengaturan', href: '/super-admin/announcements', icon: Megaphone },
-                { name: 'Laporan & Analitik', href: '/super-admin/reports', icon: PieChart },
-                { name: 'Pengaturan Sistem', href: '/super-admin/settings', icon: Settings },
-                { name: 'Support & Bantuan', href: '/super-admin/tickets', icon: HeadphonesIcon },
+                { name: 'Semua Sekolah', href: '/super-admin/tenants', icon: Building },
+                { name: 'Domain', href: '/super-admin/domains', icon: Globe },
+                { name: 'Tenant Settings', href: '/super-admin/tenant-settings', icon: Sliders },
+                { name: 'Feature Override', href: '/super-admin/tenant-settings', icon: ToggleRight },
+            ]
+        },
+        {
+            title: 'USER MANAGEMENT',
+            items: [
+                { name: 'Admin Sekolah', href: '/super-admin/users', icon: Users },
+                { name: 'Staff SaaS', href: '/super-admin/staff', icon: UserCheck },
+                { name: 'Roles', href: '/super-admin/roles', icon: Shield },
+            ]
+        },
+        {
+            title: 'SUBSCRIPTION & BILLING',
+            items: [
+                { name: 'Packages', href: '/super-admin/packages', icon: Package },
+                { name: 'Addons', href: '/super-admin/addons', icon: Puzzle },
+                { name: 'Invoice', href: '/super-admin/subscription-invoices', icon: FileText },
+                { name: 'Payment', href: '/super-admin/finance', icon: CreditCard },
+                { name: 'Refund', href: '#', icon: RotateCcw },
+                { name: 'Trial', href: '/super-admin/trials', icon: Clock },
+            ]
+        },
+        {
+            title: 'CRM & SALES',
+            items: [
+                { name: 'Leads', href: '/super-admin/leads', icon: Target },
+                { name: 'Prospects', href: '#', icon: UserPlus },
+                { name: 'Demo Request', href: '#', icon: MonitorPlay },
+            ]
+        },
+        {
+            title: 'CONTENT MANAGEMENT',
+            items: [
+                { name: 'Landing Page', href: '#', icon: LayoutTemplate },
+                { name: 'Blog', href: '#', icon: FileEdit },
+                { name: 'FAQ', href: '/super-admin/faqs', icon: HelpCircle },
+                { name: 'Broadcast', href: '/super-admin/announcements', icon: Megaphone },
+            ]
+        },
+        {
+            title: 'ANALYTICS',
+            items: [
+                { name: 'Revenue & Growth', href: '/super-admin/reports', icon: PieChart },
+                { name: 'Usage Analytics', href: '#', icon: Activity },
+            ]
+        },
+        {
+            title: 'SUPPORT CENTER',
+            items: [
+                { name: 'Ticket', href: '/super-admin/tickets', icon: HeadphonesIcon },
+                { name: 'Knowledge Base', href: '/super-admin/knowledge-bases', icon: BookOpen },
+            ]
+        },
+        {
+            title: 'SECURITY CENTER',
+            items: [
+                { name: 'Audit Log', href: '#', icon: ShieldAlert },
+                { name: 'Login Activity', href: '#', icon: Key },
+                { name: 'IP Access', href: '#', icon: Globe },
+            ]
+        },
+        {
+            title: 'SYSTEM SETTINGS',
+            items: [
+                { name: 'General', href: '/super-admin/settings', icon: Settings },
+                { name: 'Branding', href: '#', icon: Palette },
+                { name: 'Localization', href: '#', icon: Languages },
             ]
         }
     ];
 
-    // --- MENU KLIEN / SEKOLAH (FITUR ASLI) ---
+    // --- MENU KLIEN / SEKOLAH (UPDATED) ---
     const schoolGroups = [
         {
-            title: 'Manajemen',
+            title: 'DASHBOARD',
             items: [
-                { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-                { name: 'PPDB Masuk', href: '/admin/ppdb', icon: UsersRound },
-                { name: 'Data Siswa', href: '/students', icon: GraduationCap },
-                { name: 'Data Guru', href: '/teachers', icon: BriefcaseBusiness },
-                { name: 'Kelas & Ruangan', href: '/master-data/classrooms', icon: School },
-                { name: 'Mata Pelajaran', href: '/master-data/subjects', icon: BookOpen },
-                { name: 'Tahun Ajaran', href: '/master-data/academic-years', icon: CalendarDays },
+                { name: 'Dashboard Utama', href: '/dashboard', icon: LayoutDashboard },
             ]
         },
         {
-            title: 'Akademik',
+            title: 'PPDB',
+            items: [
+                { name: 'Pendaftar', href: '#', icon: UsersRound },
+                { name: 'Verifikasi', href: '#', icon: ShieldCheck },
+                { name: 'Pengumuman', href: '#', icon: Megaphone },
+            ]
+        },
+        {
+            title: 'MASTER DATA',
+            items: [
+                { name: 'Profil Sekolah', href: '#', icon: Building },
+                { name: 'Jurusan', href: '#', icon: BookOpen },
+                { name: 'Kelas & Ruangan', href: '#', icon: School },
+                { name: 'Mata Pelajaran', href: '#', icon: FileText },
+                { name: 'Tahun Ajaran', href: '#', icon: CalendarDays },
+            ]
+        },
+        {
+            title: 'SISWA',
+            items: [
+                { name: 'Data Siswa', href: '/students', icon: GraduationCap },
+                { name: 'Orang Tua', href: '#', icon: Users },
+                { name: 'Mutasi', href: '#', icon: RotateCcw },
+                { name: 'Alumni', href: '#', icon: Award },
+            ]
+        },
+        {
+            title: 'GURU & PEGAWAI',
+            items: [
+                { name: 'Data Guru', href: '/teachers', icon: BriefcaseBusiness },
+                { name: 'Data Pegawai', href: '#', icon: UserCheck },
+                { name: 'Absensi Guru', href: '#', icon: ClipboardList },
+            ]
+        },
+        {
+            title: 'AKADEMIK',
             items: [
                 { name: 'Jadwal Pelajaran', href: '/schedules', icon: CalendarClock },
-                { name: 'Absensi Siswa', href: '/attendances', icon: ClipboardList },
-                { name: 'LMS & Tugas', href: '/study-materials', icon: MonitorPlay },
-                { name: 'Ujian Online', href: '/exams', icon: FileQuestion },
-                { name: 'Input Nilai', href: '/grades', icon: Award },
+                { name: 'LMS / E-Learning', href: '/study-materials', icon: MonitorPlay },
+                { name: 'Ujian (CBT)', href: '/exams', icon: FileQuestion },
+                { name: 'Input Nilai', href: '/grades', icon: Edit },
                 { name: 'Cetak Rapor', href: '/report-cards', icon: Printer },
             ]
         },
         {
-            title: 'Keuangan',
+            title: 'KESISWAAN',
             items: [
-                { name: 'Keuangan / SPP', href: '/invoices', icon: Banknote },
+                { name: 'Bimbingan Konseling', href: '#', icon: Target },
+                { name: 'Prestasi', href: '#', icon: Award },
+                { name: 'Pelanggaran', href: '#', icon: AlertTriangle },
+                { name: 'Ekstrakurikuler', href: '#', icon: Activity },
+            ]
+        },
+        {
+            title: 'KEUANGAN',
+            items: [
+                { name: 'SPP', href: '/invoices', icon: Banknote },
+                { name: 'Tagihan Lainnya', href: '#', icon: CreditCard },
+                { name: 'Pembayaran', href: '#', icon: CheckCircle2 },
+                { name: 'Laporan Keuangan', href: '#', icon: PieChart },
+            ]
+        },
+        {
+            title: 'FASILITAS & LAYANAN',
+            items: [
+                { name: 'Perpustakaan', href: '#', icon: BookOpen },
+                { name: 'Sarpras', href: '#', icon: Database },
+                { name: 'Komunikasi', href: '#', icon: MessageSquare },
+                { name: 'Surat Menyurat', href: '#', icon: Mail },
+            ]
+        },
+        {
+            title: 'SISTEM',
+            items: [
+                { name: 'Laporan Umum', href: '#', icon: FileText },
+                { name: 'Pengaturan', href: '#', icon: Settings },
             ]
         }
     ];
@@ -98,6 +221,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                             src="/images/logo.png"
                             alt="Lambang Institusi"
                             className="w-11 h-11 object-contain bg-transparent shrink-0 drop-shadow-[0_2px_6px_rgba(184,147,95,0.25)]"
+                            onError={(e) => { e.currentTarget.style.display = 'none' }}
                         />
                         <div className="leading-tight">
                             <span className="font-serif font-semibold text-lg text-white tracking-tight block">
@@ -123,6 +247,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                                     <Link
                                         key={item.name}
                                         href={item.href}
+                                        preserveScroll
                                         className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
                                             isActive
                                             ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
@@ -176,7 +301,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                     <aside className="relative w-72 bg-[#0F1729] text-[#A9B2C7] flex flex-col h-full shadow-2xl">
                         <div className="h-20 flex items-center justify-between px-6 border-b border-[#B8935F]/15 shrink-0">
                             <div className="flex items-center gap-2.5">
-                                <img src="/images/logo.png" alt="Lambang Institusi" className="w-8 h-8 object-contain bg-transparent shrink-0" />
+                                <img src="/images/logo.png" alt="Lambang Institusi" className="w-8 h-8 object-contain bg-transparent shrink-0" onError={(e) => { e.currentTarget.style.display = 'none' }} />
                                 <span className="font-serif font-semibold text-base text-white">Akademia<span className="text-[#D4AF7A]">OS</span></span>
                             </div>
                             <button onClick={() => setIsMobileMenuOpen(false)}><X className="w-5 h-5 text-white" /></button>
@@ -190,10 +315,19 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                                     {group.items.map((item) => {
                                         const isActive = currentUrl !== '' && currentUrl.startsWith(item.href) && item.href !== '#';
                                         return (
-                                            <Link key={item.name} href={item.href} className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium ${isActive ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]' : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'}`}>
-                                                <item.icon className={`w-4 h-4 mr-3 shrink-0 ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593]'}`} />
-                                                <span className="truncate">{item.name}</span>
-                                            </Link>
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            preserveScroll
+                                            className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
+                                                isActive
+                                                ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
+                                                : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'
+                                            }`}
+                                        >
+                                            <item.icon className={`w-4 h-4 mr-3 shrink-0 transition-colors ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593] group-hover:text-[#D4AF7A]'}`} />
+                                            <span className="truncate">{item.name}</span>
+                                        </Link>
                                         );
                                     })}
                                 </div>

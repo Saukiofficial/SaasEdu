@@ -9,63 +9,54 @@ use Inertia\Inertia;
 
 class AnnouncementController extends Controller
 {
-    protected AnnouncementService $announcementService;
+    protected $announcementService;
 
     public function __construct(AnnouncementService $announcementService)
     {
         $this->announcementService = $announcementService;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        if (auth()->user()->school_id !== null) abort(403);
-
-        $search = $request->query('search');
-        $announcements = $this->announcementService->getAnnouncements($search);
-
+        $announcements = $this->announcementService->getAllAnnouncements(10);
+        
         return Inertia::render('SuperAdmin/Announcements/Index', [
-            'announcements' => $announcements,
-            'filters' => ['search' => $search]
+            'announcements' => $announcements
         ]);
     }
 
     public function store(Request $request)
     {
-        if (auth()->user()->school_id !== null) abort(403);
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'type' => 'required|in:info,warning,success,event',
+            'type' => 'required|in:info,warning,success,promo',
             'is_active' => 'boolean',
         ]);
 
         $this->announcementService->createAnnouncement($validated);
 
-        return redirect()->back()->with('message', 'Pengumuman berhasil dipublikasikan.');
+        return redirect()->back()->with('success', 'Broadcast pengumuman berhasil dibuat.');
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        if (auth()->user()->school_id !== null) abort(403);
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'type' => 'required|in:info,warning,success,event',
+            'type' => 'required|in:info,warning,success,promo',
             'is_active' => 'boolean',
         ]);
 
         $this->announcementService->updateAnnouncement($id, $validated);
 
-        return redirect()->back()->with('message', 'Pengumuman berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Broadcast pengumuman berhasil diperbarui.');
     }
 
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        if (auth()->user()->school_id !== null) abort(403);
-
         $this->announcementService->deleteAnnouncement($id);
-        return redirect()->back()->with('message', 'Pengumuman berhasil dihapus.');
+        
+        return redirect()->back()->with('success', 'Broadcast berhasil dihapus.');
     }
 }

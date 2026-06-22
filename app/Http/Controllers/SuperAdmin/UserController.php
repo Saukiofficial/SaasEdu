@@ -3,50 +3,52 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    protected $userService;
+
+    public function __construct(UserService $userService)
     {
-        // Proteksi: Pastikan hanya Super Admin yang bisa mengakses
-        if (auth()->user()->school_id !== null) {
-            abort(403, 'Akses ditolak.');
-        }
+        $this->userService = $userService;
+    }
 
-        $search = $request->query('search');
-
-        // Ambil data user beserta relasi school (tenant) dan roles-nya
-        $users = User::with(['school', 'roles'])
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
-
+    public function index()
+    {
+        $users = $this->userService->getAllUsers(15);
+        
         return Inertia::render('SuperAdmin/Users/Index', [
-            'users' => $users,
-            'filters' => ['search' => $search]
+            'users' => $users
         ]);
     }
 
-    public function destroy(string $id)
+    public function store(Request $request)
     {
-        if (auth()->user()->school_id !== null) abort(403);
+        // Validasi khusus untuk menambah akun Staff internal SaaS
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', Rules\Password::defaults()],
+        ]);
 
-        $user = User::findOrFail($id);
-        
-        // Cegah Super Admin menghapus akun SaaS miliknya sendiri
-        if ($user->school_id === null) {
-            return redirect()->back()->withErrors(['error' => 'Tidak dapat menghapus akun utama Super Admin.']);
+        $this->userService->createSaaSStaff($validated);
+
+        return redirect()->back()->with('success', 'Akun Staff SaaS baru berhasil ditambahkan.');
+    }
+
+    public function destroy($id)
+    {
+        // Mencegah user menghapus akunnya sendiri (opsional namun sangat disarankan)
+        if (auth()->id() == $id) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
-        $user->delete();
-
-        return redirect()->back()->with('message', 'Pengguna berhasil dihapus dari sistem.');
+        $this->userService->deleteUser($id);
+        
+        return redirect()->back()->with('success', 'Akun pengguna berhasil dihapus.');
     }
 }

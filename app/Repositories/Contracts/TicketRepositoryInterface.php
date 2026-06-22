@@ -2,7 +2,10 @@
 
 namespace App\Repositories\Contracts;
 
-interface TicketRepositoryInterface extends BaseRepositoryInterface
+interface TicketRepositoryInterface
 {
-    public function getPaginatedTickets(int $perPage = 15, array $filters = []);
+    public function getAllPaginatedWithSchool(int $perPage = 10);
+    public function findById(string $id);
+    public function updateStatus(string $id, string $status);
+    public function delete(string $id);
 }

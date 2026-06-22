@@ -28,7 +28,7 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Role::create(['name' => $role]);
+            Role::create(['name' => $role, 'guard_name' => 'web']);
         }
 
         // 2. Buat Akun Super Admin Default

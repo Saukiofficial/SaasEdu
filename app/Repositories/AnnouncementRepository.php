@@ -5,25 +5,40 @@ namespace App\Repositories;
 use App\Models\Announcement;
 use App\Repositories\Contracts\AnnouncementRepositoryInterface;
 
-class AnnouncementRepository extends BaseRepository implements AnnouncementRepositoryInterface
+class AnnouncementRepository implements AnnouncementRepositoryInterface
 {
-    public function __construct(Announcement $model)
+    public function getAllPaginated(int $perPage = 10)
     {
-        parent::__construct($model);
+        return Announcement::orderBy('created_at', 'desc')->paginate($perPage);
     }
 
-    public function getPaginated(int $perPage = 10, string $search = null)
+    public function findById(string $id)
     {
-        return $this->model
-            ->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate($perPage);
+        return Announcement::findOrFail($id);
     }
 
-    public function getActiveAnnouncements(int $limit = 5)
+    public function create(array $data)
     {
-        return $this->model->where('is_active', true)->latest()->take($limit)->get();
+        return Announcement::create($data);
+    }
+
+    public function update(string $id, array $data)
+    {
+        $announcement = $this->findById($id);
+        $announcement->update($data);
+        return $announcement;
+    }
+
+    public function delete(string $id)
+    {
+        $announcement = $this->findById($id);
+        return $announcement->delete();
+    }
+
+    public function updateStatus(string $id, bool $isActive)
+    {
+        $announcement = $this->findById($id);
+        $announcement->update(['is_active' => $isActive]);
+        return $announcement;
     }
 }

@@ -3,46 +3,40 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\School;
+use App\Services\TenantService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TenantController extends Controller
 {
+    protected $tenantService;
+
+    public function __construct(TenantService $tenantService)
+    {
+        $this->tenantService = $tenantService;
+    }
+
     public function index()
     {
-        // Proteksi: Pastikan hanya Super Admin (school_id null) yang bisa akses
-        if (auth()->user()->school_id !== null) {
-            abort(403, 'Anda bukan Super Admin.');
-        }
-
-        // Ambil semua data sekolah beserta jumlah akun usernya, dan data langganan terakhir
-        $tenants = School::withCount('users')
-            ->with('latestSubscription') // Ambil relasi langganan untuk info paket
-            ->latest()
-            ->paginate(15);
-
+        $tenants = $this->tenantService->getAllTenants(15);
+        
         return Inertia::render('SuperAdmin/Tenants/Index', [
             'tenants' => $tenants
         ]);
     }
 
-    public function updateStatus(Request $request, string $id)
+    public function updateStatus(Request $request, $id)
     {
-        // Proteksi Super Admin
-        if (auth()->user()->school_id !== null) {
-            abort(403, 'Anda bukan Super Admin.');
-        }
-
         $validated = $request->validate([
-            'status' => 'required|in:active,suspended',
+            'status' => 'required|in:active,suspended,inactive'
         ]);
 
-        $school = School::findOrFail($id);
-        $school->update(['status' => $validated['status']]);
+        $this->tenantService->updateTenantStatus($id, $validated['status']);
 
-        $statusText = $validated['status'] === 'active' ? 'diaktifkan' : 'disuspend';
+        $message = $validated['status'] === 'suspended' 
+            ? 'Akses institusi (tenant) berhasil ditangguhkan.' 
+            : 'Institusi berhasil diaktifkan kembali.';
 
-        return redirect()->back()->with('message', "Status tenant {$school->name} berhasil {$statusText}.");
+        return redirect()->back()->with('success', $message);
     }
 }

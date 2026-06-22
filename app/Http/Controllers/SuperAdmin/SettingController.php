@@ -3,59 +3,57 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SaasSetting;
+use App\Services\SettingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SettingController extends Controller
 {
+    protected $settingService;
+
+    public function __construct(SettingService $settingService)
+    {
+        $this->settingService = $settingService;
+    }
+
     public function index()
     {
-        if (auth()->user()->school_id !== null) {
-            abort(403, 'Akses ditolak.');
-        }
-
-        // Ambil semua setting dan jadikan Key-Value Pair
-        $settings = SaasSetting::all()->mapWithKeys(function ($item) {
-            $value = $item->value;
-            if ($item->type === 'boolean') {
-                $value = filter_var($item->value, FILTER_VALIDATE_BOOLEAN);
-            }
-            return [$item->key => $value];
-        })->toArray();
+        // Mengambil semua konfigurasi yang ada di database
+        $settings = $this->settingService->getAllSettingsAsKeyValue();
+        
+        // Data default jika database masih kosong
+        $defaultSettings = [
+            'app_name' => $settings['app_name'] ?? 'AkademiaOS',
+            'app_description' => $settings['app_description'] ?? 'Platform Manajemen Akademik Terpadu',
+            'maintenance_mode' => $settings['maintenance_mode'] ?? '0',
+            'contact_email' => $settings['contact_email'] ?? 'support@akademiaos.com',
+            'contact_phone' => $settings['contact_phone'] ?? '+62 812 3456 7890',
+            'contact_address' => $settings['contact_address'] ?? 'Jakarta, Indonesia',
+            'brand_primary_color' => $settings['brand_primary_color'] ?? '#0F1729',
+            'brand_secondary_color' => $settings['brand_secondary_color'] ?? '#B8935F',
+        ];
 
         return Inertia::render('SuperAdmin/Settings/Index', [
-            'settings' => $settings
+            'settings' => $defaultSettings
         ]);
     }
 
     public function update(Request $request)
     {
-        if (auth()->user()->school_id !== null) abort(403);
+        // Validasi bebas karena sifatnya key-value dinamis
+        $validated = $request->validate([
+            'app_name' => 'required|string|max:255',
+            'app_description' => 'nullable|string',
+            'maintenance_mode' => 'required|in:0,1',
+            'contact_email' => 'required|email|max:255',
+            'contact_phone' => 'nullable|string|max:50',
+            'contact_address' => 'nullable|string',
+            'brand_primary_color' => 'required|string|max:20',
+            'brand_secondary_color' => 'required|string|max:20',
+        ]);
 
-        $data = $request->except(['_token', '_method']);
+        $this->settingService->updateSettings($validated);
 
-        // Update atau buat setting baru secara iteratif
-        foreach ($data as $key => $value) {
-            $setting = SaasSetting::where('key', $key)->first();
-            
-            // Konversi boolean ke string agar aman disimpan di database
-            if (is_bool($value)) {
-                $value = $value ? 'true' : 'false';
-            }
-
-            if ($setting) {
-                $setting->update(['value' => $value]);
-            } else {
-                SaasSetting::create([
-                    'key' => $key,
-                    'value' => $value,
-                    'type' => is_bool($value) ? 'boolean' : 'string',
-                    'group' => 'general'
-                ]);
-            }
-        }
-
-        return redirect()->back()->with('message', 'Pengaturan sistem berhasil disimpan.');
+        return redirect()->back()->with('success', 'Pengaturan sistem berhasil diperbarui.');
     }
 }

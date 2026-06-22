@@ -5,32 +5,32 @@ namespace App\Repositories;
 use App\Models\Ticket;
 use App\Repositories\Contracts\TicketRepositoryInterface;
 
-class TicketRepository extends BaseRepository implements TicketRepositoryInterface
+class TicketRepository implements TicketRepositoryInterface
 {
-    public function __construct(Ticket $model)
+    public function getAllPaginatedWithSchool(int $perPage = 10)
     {
-        parent::__construct($model);
+        // Menampilkan tiket terbaru terlebih dahulu, dan mengambil relasi nama sekolah
+        return Ticket::with('school')
+                ->orderByRaw("FIELD(status, 'open', 'in_progress', 'resolved', 'closed')")
+                ->orderBy('created_at', 'desc')
+                ->paginate($perPage);
     }
 
-    public function getPaginatedTickets(int $perPage = 15, array $filters = [])
+    public function findById(string $id)
     {
-        $query = $this->model->with(['school', 'user']);
+        return Ticket::with('school')->findOrFail($id);
+    }
 
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-        if (!empty($filters['priority'])) {
-            $query->where('priority', $filters['priority']);
-        }
-        if (!empty($filters['search'])) {
-            $query->where('ticket_number', 'like', "%{$filters['search']}%")
-                  ->orWhere('subject', 'like', "%{$filters['search']}%");
-        }
+    public function updateStatus(string $id, string $status)
+    {
+        $ticket = $this->findById($id);
+        $ticket->update(['status' => $status]);
+        return $ticket;
+    }
 
-        // Urutkan tiket yang masih open dan prioritas tinggi ke atas
-        return $query->orderByRaw("FIELD(status, 'open', 'in_progress', 'resolved', 'closed')")
-                     ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
-                     ->latest()
-                     ->paginate($perPage);
+    public function delete(string $id)
+    {
+        $ticket = $this->findById($id);
+        return $ticket->delete();
     }
 }

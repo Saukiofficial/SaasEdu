@@ -8,20 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
+        Schema::create('faqs', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            
-            $table->string('title');
-            $table->text('content');
-            $table->enum('type', ['info', 'warning', 'success', 'event'])->default('info');
+            $table->string('question');
+            $table->text('answer');
+            $table->string('category')->default('General');
+            $table->integer('order_num')->default(0); // Untuk mengatur urutan urutan tampil
             $table->boolean('is_active')->default(true);
-            
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::dropIfExists('faqs');
     }
 };

@@ -29,12 +29,38 @@ use App\Repositories\Contracts\StudyMaterialRepositoryInterface;
 use App\Repositories\StudyMaterialRepository;
 use App\Repositories\Contracts\ExamRepositoryInterface;
 use App\Repositories\ExamRepository;
-use App\Repositories\Contracts\SubscriptionPackageRepositoryInterface;
-use App\Repositories\SubscriptionPackageRepository; 
+use App\Repositories\Contracts\PackageRepositoryInterface;
+use App\Repositories\PackageRepository; 
 use App\Repositories\Contracts\AnnouncementRepositoryInterface;
 use App\Repositories\AnnouncementRepository;
 use App\Repositories\Contracts\TicketRepositoryInterface;
 use App\Repositories\TicketRepository;
+use App\Repositories\Contracts\LeadRepositoryInterface;
+use App\Repositories\LeadRepository;
+use App\Repositories\Contracts\TrialRepositoryInterface;
+use App\Repositories\TrialRepository;
+use App\Repositories\Contracts\TenantSettingRepositoryInterface;
+use App\Repositories\TenantSettingRepository;
+use App\Repositories\Contracts\KnowledgeBaseRepositoryInterface;
+use App\Repositories\KnowledgeBaseRepository;
+use App\Repositories\Contracts\FaqRepositoryInterface;
+use App\Repositories\FaqRepository;
+use App\Repositories\Contracts\SettingRepositoryInterface;
+use App\Repositories\SettingRepository;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
+use App\Repositories\Contracts\TenantRepositoryInterface;
+use App\Repositories\TenantRepository;
+use App\Repositories\Contracts\RoleRepositoryInterface;
+use App\Repositories\RoleRepository;
+use App\Repositories\Contracts\DomainRepositoryInterface;
+use App\Repositories\DomainRepository;
+use App\Repositories\Contracts\StaffRepositoryInterface;
+use App\Repositories\StaffRepository;
+use App\Repositories\Contracts\AddonRepositoryInterface;
+use App\Repositories\AddonRepository;
+use App\Repositories\Contracts\SubscriptionInvoiceRepositoryInterface;
+use App\Repositories\SubscriptionInvoiceRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -53,9 +79,23 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PaymentRepositoryInterface::class, PaymentRepository::class);
         $this->app->bind(StudyMaterialRepositoryInterface::class, StudyMaterialRepository::class);
         $this->app->bind(ExamRepositoryInterface::class, ExamRepository::class);
-        $this->app->bind(SubscriptionPackageRepositoryInterface::class, SubscriptionPackageRepository::class);
+        $this->app->bind(PackageRepositoryInterface::class, PackageRepository::class);
         $this->app->bind(AnnouncementRepositoryInterface::class, AnnouncementRepository::class);
         $this->app->bind(TicketRepositoryInterface::class, TicketRepository::class);
+        $this->app->bind(LeadRepositoryInterface::class, LeadRepository::class);
+        $this->app->bind(TrialRepositoryInterface::class, TrialRepository::class);
+        $this->app->bind(TenantSettingRepositoryInterface::class, TenantSettingRepository::class);
+        $this->app->bind(KnowledgeBaseRepositoryInterface::class, KnowledgeBaseRepository::class);
+        $this->app->bind(FaqRepositoryInterface::class, FaqRepository::class);
+        $this->app->bind(SettingRepositoryInterface::class, SettingRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(TenantRepositoryInterface::class, TenantRepository::class);
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
+        $this->app->bind(DomainRepositoryInterface::class, DomainRepository::class);
+        $this->app->bind(StaffRepositoryInterface::class, StaffRepository::class);
+        $this->app->bind(AddonRepositoryInterface::class, AddonRepository::class);
+        $this->app->bind(SubscriptionInvoiceRepositoryInterface::class, SubscriptionInvoiceRepository::class);
+
     }
 
     public function boot(): void

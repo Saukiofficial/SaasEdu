@@ -10,18 +10,16 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('school_id')->constrained('schools')->onDelete('cascade');
-            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade'); // User yang membuat tiket
-            
-            $table->string('ticket_number')->unique();
+            $table->string('ticket_number')->unique(); // Format misal: TKT-20260627-XXXX
+            $table->uuid('school_id'); // Relasi ke tenant yang membuka tiket
             $table->string('subject');
-            $table->text('description'); // Keluhan/pertanyaan dari sekolah
-            $table->text('admin_response')->nullable(); // Balasan dari Super Admin
-            
+            $table->text('description');
+            $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
             $table->enum('status', ['open', 'in_progress', 'resolved', 'closed'])->default('open');
-            $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
-            
             $table->timestamps();
+
+            // Opsional: Relasi ke tabel schools
+            // $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
         });
     }
 

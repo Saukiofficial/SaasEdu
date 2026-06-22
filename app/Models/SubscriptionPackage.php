@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Traits\UsesUuid;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SubscriptionPackage extends Model
 {
@@ -14,22 +14,20 @@ class SubscriptionPackage extends Model
         'name',
         'description',
         'price',
-        'duration_days',
+        'billing_cycle', // monthly, yearly, one-time
         'max_students',
-        'max_users',
-        'features',
+        'storage_limit_mb',
+        'features',      // JSON array
         'is_active',
+        'is_popular',    // Untuk highlight paket terlaris
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'duration_days' => 'integer',
-            'max_students' => 'integer',
-            'max_users' => 'integer',
-            'features' => 'array',
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'price' => 'decimal:2',
+        'max_students' => 'integer',
+        'storage_limit_mb' => 'integer',
+        'features' => 'array',
+        'is_active' => 'boolean',
+        'is_popular' => 'boolean',
+    ];
 }

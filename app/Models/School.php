@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\TenantSetting;
 use App\Traits\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,5 +34,10 @@ class School extends Model
     public function latestSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+        public function tenantSetting(): HasOne
+    {
+        return $this->hasOne(TenantSetting::class, 'school_id');
     }
 }

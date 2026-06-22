@@ -45,7 +45,9 @@ Route::middleware('auth')->group(function () {
         
         Route::resource('packages', \App\Http\Controllers\SuperAdmin\PackageController::class)->except(['create', 'show', 'edit']);
         Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class)->only(['index', 'destroy']);
-        Route::resource('announcements', \App\Http\Controllers\SuperAdmin\AnnouncementController::class)->except(['create', 'show', 'edit']);
+        Route::resource('roles', \App\Http\Controllers\SuperAdmin\RoleController::class)->except(['create', 'show', 'edit']);
+        Route::resource('staff', \App\Http\Controllers\SuperAdmin\StaffController::class)->except(['create', 'show', 'edit']);
+        
         
         Route::get('/finance', [\App\Http\Controllers\SuperAdmin\FinanceController::class, 'index'])->name('finance.index');
         Route::put('/finance/{subscription}/status', [\App\Http\Controllers\SuperAdmin\FinanceController::class, 'updateStatus'])->name('finance.update-status');
@@ -57,6 +59,34 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'update'])->name('settings.update');
 
         Route::resource('tickets', \App\Http\Controllers\SuperAdmin\TicketController::class)->only(['index', 'update', 'destroy']);
+
+        Route::resource('leads', \App\Http\Controllers\SuperAdmin\LeadController::class)->only(['index', 'store', 'destroy']);
+        Route::put('leads/{lead}/status', [\App\Http\Controllers\SuperAdmin\LeadController::class, 'updateStatus'])->name('leads.update-status');
+
+        // --- SUBSCRIPTION & BILLING Module ---
+        Route::resource('trials', \App\Http\Controllers\SuperAdmin\TrialController::class)->only(['index', 'store', 'destroy']);
+        Route::put('trials/{trial}/status', [\App\Http\Controllers\SuperAdmin\TrialController::class, 'updateStatus'])->name('trials.update-status');
+        Route::resource('packages', \App\Http\Controllers\SuperAdmin\PackageController::class)->except(['create', 'show', 'edit']);
+        Route::resource('addons', \App\Http\Controllers\SuperAdmin\AddonController::class)->except(['create', 'show', 'edit']);
+        Route::resource('subscription-invoices', \App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class)->only(['index', 'store', 'destroy']);
+        Route::put('subscription-invoices/{invoice}/pay', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'markAsPaid'])->name('subscription-invoices.pay');
+        Route::put('subscription-invoices/{invoice}/cancel', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'cancel'])->name('subscription-invoices.cancel');
+
+
+        // --- TENANT MANAGEMENT Module ---
+        Route::get('tenant-settings', [\App\Http\Controllers\SuperAdmin\TenantSettingController::class, 'index'])->name('tenant-settings.index');
+        Route::put('tenant-settings/{schoolId}', [\App\Http\Controllers\SuperAdmin\TenantSettingController::class, 'update'])->name('tenant-settings.update');
+        Route::get('domains', [\App\Http\Controllers\SuperAdmin\DomainController::class, 'index'])->name('domains.index');
+        Route::put('domains/{schoolId}', [\App\Http\Controllers\SuperAdmin\DomainController::class, 'update'])->name('domains.update');
+
+        // --- CONTENT & SUPPORT Module ---
+        Route::resource('knowledge-bases', \App\Http\Controllers\SuperAdmin\KnowledgeBaseController::class)->except(['create', 'show', 'edit']);
+
+        // --- CONTENT MANAGEMENT Module ---
+        Route::resource('faqs', \App\Http\Controllers\SuperAdmin\FaqController::class)->except(['create', 'show', 'edit']);
+        Route::resource('announcements', \App\Http\Controllers\SuperAdmin\AnnouncementController::class)->except(['create', 'show', 'edit']);
+
+
     });
 
     // Group Master Data

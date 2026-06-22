@@ -1,178 +1,206 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Button } from '@/Components/ui/button';
-import { PieChart, TrendingUp, Users, Building, Download, BarChart2 } from 'lucide-react';
+import { 
+    PieChart, Building2, Users, Target, HeadphonesIcon, 
+    DownloadCloud, Calendar as CalendarIcon, TrendingUp,
+    BarChart3, Activity, ArrowUpRight, ArrowDownRight
+} from 'lucide-react';
 
-export default function ReportIndex({ stats, packageDistribution, monthlyGrowth }: any) {
-    
-    // Helper untuk memformat Rupiah
-    const formatRupiah = (number: number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+export default function ReportsIndex({ stats }: { stats: any }) {
+    const [period, setPeriod] = useState('Bulan Ini');
+
+    // Komponen visualisasi bar chart sederhana berbasis SVG
+    const SimpleBarChart = () => {
+        const data = [40, 70, 45, 90, 65, 85, 120, 95, 110, 80, 130, 150];
+        const max = Math.max(...data);
+        
+        return (
+            <div className="h-64 w-full flex items-end justify-between gap-2 md:gap-4 mt-6 border-b border-[#E2DDD0] pb-2">
+                {data.map((val, i) => (
+                    <div key={i} className="w-full flex flex-col justify-end items-center group relative">
+                        <div 
+                            className="w-full bg-[#0F1729] rounded-t-md hover:bg-[#B8935F] transition-colors cursor-pointer"
+                            style={{ height: `${(val / max) * 100}%` }}
+                        ></div>
+                        <div className="absolute -top-8 bg-[#1B2742] text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {val} Tenant
+                        </div>
+                        <span className="text-[10px] text-[#8B93A8] mt-2 block">
+                            {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][i]}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        );
     };
 
-    // Mencari nilai max klien dari data untuk mengatur persentase tinggi bar chart
-    const maxClients = Math.max(...monthlyGrowth.map((data: any) => data.clients));
-
     return (
-        <AuthenticatedLayout header="Laporan & Analitik (Global)">
-            <Head title="SaaS - Laporan & Analitik" />
+        <AuthenticatedLayout header="Analytics & Reports">
+            <Head title="Laporan & Analitik - AkademiaOS" />
 
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Analitik SaaS Anda</h2>
-                    <p className="text-sm text-slate-500 mt-1">Pantau performa, adopsi pengguna, dan pertumbuhan pendapatan platform.</p>
-                </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md rounded-xl">
-                    <Download className="w-4 h-4 mr-2" /> Export Laporan (PDF)
-                </Button>
-            </div>
-
-            {/* Top Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm flex flex-col dark:bg-slate-950 dark:border-slate-800">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
-                            <Building className="w-5 h-5" />
-                        </div>
-                        <h3 className="font-semibold text-slate-500">Total Klien (Tenant)</h3>
+            <div className="space-y-6">
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-serif font-semibold text-[#0F1729] flex items-center gap-2">
+                            <PieChart className="w-6 h-6 text-[#B8935F]" />
+                            Laporan & Pertumbuhan SaaS
+                        </h1>
+                        <p className="text-sm text-[#8B93A8] mt-1">
+                            Analisis matriks utama, pendaftaran tenant baru, dan konversi prospek.
+                        </p>
                     </div>
-                    <div className="flex items-end justify-between">
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.total_schools}</h2>
-                        <span className="flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +12%
-                        </span>
+                    <div className="flex items-center gap-3">
+                        <select 
+                            value={period}
+                            onChange={(e) => setPeriod(e.target.value)}
+                            className="px-4 py-2.5 bg-white border border-[#E2DDD0] rounded-md text-sm font-medium text-[#0F1729] focus:outline-none focus:border-[#B8935F] shadow-sm cursor-pointer"
+                        >
+                            <option value="Bulan Ini">Bulan Ini</option>
+                            <option value="Kuartal Ini">Kuartal Ini (Q3)</option>
+                            <option value="Tahun Ini">Tahun Ini (2026)</option>
+                            <option value="Semua Waktu">Semua Waktu</option>
+                        </select>
+                        <button className="flex items-center gap-2 bg-[#0F1729] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#1B2742] transition-colors shadow-sm">
+                            <DownloadCloud className="w-4 h-4 text-[#D4AF7A]" />
+                            Unduh PDF
+                        </button>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">{stats.active_schools} tenant aktif berlangganan</p>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm flex flex-col dark:bg-slate-950 dark:border-slate-800">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
-                            <Users className="w-5 h-5" />
-                        </div>
-                        <h3 className="font-semibold text-slate-500">Total Pengguna</h3>
-                    </div>
-                    <div className="flex items-end justify-between">
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.total_users.toLocaleString('id-ID')}</h2>
-                        <span className="flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +24%
-                        </span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-2">Tersebar di seluruh tenant</p>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm flex flex-col dark:bg-slate-950 dark:border-slate-800">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
-                            <PieChart className="w-5 h-5" />
+                {/* KPI Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    {/* Card 1: Total Tenant */}
+                    <div className="bg-white p-5 rounded-2xl border border-[#E2DDD0] shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                                <Building2 className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                                <ArrowUpRight className="w-3 h-3" /> +12%
+                            </span>
                         </div>
-                        <h3 className="font-semibold text-slate-500">Estimasi ARR (Tahunan)</h3>
+                        <h3 className="text-3xl font-bold text-[#0F1729]">{stats?.total_schools || 0}</h3>
+                        <p className="text-xs font-semibold text-[#8B93A8] uppercase tracking-wider mt-1">Total Sekolah (Tenant)</p>
+                        <p className="text-[11px] text-[#A8A296] mt-3">
+                            <strong className="text-emerald-600">{stats?.active_schools || 0} Aktif</strong> · {stats?.suspended_schools || 0} Ditangguhkan
+                        </p>
                     </div>
-                    <div className="flex items-end justify-between">
-                        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Rp 2.4M</h2>
-                        <span className="flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +15%
-                        </span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-2">Berdasarkan langganan aktif saat ini</p>
-                </div>
-            </div>
 
-            {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* Bar Chart Pertumbuhan Klien */}
-                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 lg:col-span-2 dark:bg-slate-950 dark:border-slate-800">
-                    <div className="flex justify-between items-center mb-8">
-                        <div>
-                            <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                                <BarChart2 className="w-5 h-5 text-blue-600" /> Grafik Pertumbuhan Klien (YTD)
-                            </h3>
-                            <p className="text-xs text-slate-500 mt-1">Akumulasi pendaftaran tenant baru setiap bulannya.</p>
+                    {/* Card 2: Total Users */}
+                    <div className="bg-white p-5 rounded-2xl border border-[#E2DDD0] shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center">
+                                <Users className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                                <ArrowUpRight className="w-3 h-3" /> +8.4%
+                            </span>
                         </div>
+                        <h3 className="text-3xl font-bold text-[#0F1729]">{stats?.total_users || 0}</h3>
+                        <p className="text-xs font-semibold text-[#8B93A8] uppercase tracking-wider mt-1">Total Pengguna Platform</p>
+                        <p className="text-[11px] text-[#A8A296] mt-3">
+                            <strong className="text-[#0F1729]">{stats?.tenant_users || 0} Akun Sekolah</strong> · {stats?.saas_staff || 0} Staff SaaS
+                        </p>
                     </div>
-                    
-                    {/* Visualisasi Bar Chart Menggunakan Tailwind */}
-                    <div className="h-64 flex items-end gap-2 md:gap-4 relative pt-10">
-                        {/* Garis Horizontal Latar Belakang */}
-                        <div className="absolute inset-0 flex flex-col justify-between pt-10 pb-6 pointer-events-none">
-                            {[4, 3, 2, 1, 0].map(line => (
-                                <div key={line} className="border-b border-slate-100 w-full h-0 flex items-center dark:border-slate-800">
-                                    <span className="text-[10px] text-slate-400 bg-white dark:bg-slate-950 pr-2 absolute -left-1">
-                                        {Math.round((maxClients / 4) * line)}
-                                    </span>
+
+                    {/* Card 3: Leads & Prospek */}
+                    <div className="bg-white p-5 rounded-2xl border border-[#E2DDD0] shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center">
+                                <Target className="w-5 h-5 text-amber-600" />
+                            </div>
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded-md">
+                                <ArrowDownRight className="w-3 h-3" /> -2.1%
+                            </span>
+                        </div>
+                        <h3 className="text-3xl font-bold text-[#0F1729]">{stats?.total_leads || 0}</h3>
+                        <p className="text-xs font-semibold text-[#8B93A8] uppercase tracking-wider mt-1">Total Prospek (Leads)</p>
+                        <p className="text-[11px] text-[#A8A296] mt-3">
+                            <strong className="text-emerald-600">{stats?.converted_leads || 0} Berhasil Konversi</strong>
+                        </p>
+                    </div>
+
+                    {/* Card 4: Support Tickets */}
+                    <div className="bg-white p-5 rounded-2xl border border-[#E2DDD0] shadow-sm">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center">
+                                <HeadphonesIcon className="w-5 h-5 text-rose-600" />
+                            </div>
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md">
+                                Stabil
+                            </span>
+                        </div>
+                        <h3 className="text-3xl font-bold text-[#0F1729]">{stats?.open_tickets || 0}</h3>
+                        <p className="text-xs font-semibold text-[#8B93A8] uppercase tracking-wider mt-1">Tiket Perlu Tindakan</p>
+                        <p className="text-[11px] text-[#A8A296] mt-3">
+                            <strong className="text-[#0F1729]">{stats?.resolved_tickets || 0} Tiket Selesai</strong>
+                        </p>
+                    </div>
+                </div>
+
+                {/* Grafik Utama & List Informasi */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Chart */}
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E2DDD0] shadow-sm lg:col-span-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <div>
+                                <h3 className="text-lg font-bold text-[#0F1729] flex items-center gap-2">
+                                    <BarChart3 className="w-5 h-5 text-[#B8935F]" /> Pertumbuhan Akuisisi Sekolah (YTD)
+                                </h3>
+                                <p className="text-sm text-[#8B93A8]">Grafik pendaftaran tenant baru sepanjang tahun 2026.</p>
+                            </div>
+                        </div>
+                        <SimpleBarChart />
+                    </div>
+
+                    {/* Quick Stats / Info List */}
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#E2DDD0] shadow-sm lg:col-span-1 flex flex-col">
+                        <h3 className="text-lg font-bold text-[#0F1729] mb-1 flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-[#B8935F]" /> Aktivitas Platform
+                        </h3>
+                        <p className="text-sm text-[#8B93A8] mb-6">Ringkasan penggunaan resource.</p>
+
+                        <div className="flex-1 space-y-6">
+                            <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="font-semibold text-[#0F1729]">Kapasitas Server Utama</span>
+                                    <span className="font-bold text-emerald-600">62%</span>
                                 </div>
-                            ))}
+                                <div className="w-full bg-[#FAF8F3] rounded-full h-2.5 border border-[#E2DDD0]">
+                                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: '62%' }}></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="font-semibold text-[#0F1729]">Storage Cloud Terpakai</span>
+                                    <span className="font-bold text-amber-600">84%</span>
+                                </div>
+                                <div className="w-full bg-[#FAF8F3] rounded-full h-2.5 border border-[#E2DDD0]">
+                                    <div className="bg-amber-500 h-full rounded-full" style={{ width: '84%' }}></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="flex justify-between text-sm mb-1">
+                                    <span className="font-semibold text-[#0F1729]">Beban Database (Query)</span>
+                                    <span className="font-bold text-blue-600">45%</span>
+                                </div>
+                                <div className="w-full bg-[#FAF8F3] rounded-full h-2.5 border border-[#E2DDD0]">
+                                    <div className="bg-blue-500 h-full rounded-full" style={{ width: '45%' }}></div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Bar Data */}
-                        {monthlyGrowth.map((data: any, i: number) => {
-                            const barHeight = `${(data.clients / maxClients) * 100}%`;
-                            return (
-                                <div key={i} className="flex-1 flex flex-col items-center gap-2 z-10 group relative">
-                                    {/* Tooltip pada saat hover */}
-                                    <div className="absolute -top-10 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
-                                        {data.clients} Klien ({formatRupiah(data.revenue)})
-                                    </div>
-
-                                    {/* Bar Utama */}
-                                    <div className="w-full max-w-[60px] bg-blue-100 dark:bg-blue-900/30 rounded-t-md relative flex items-end justify-center h-full">
-                                        <div 
-                                            className="w-full bg-blue-600 hover:bg-blue-500 transition-colors rounded-t-md relative overflow-hidden" 
-                                            style={{ height: barHeight }}
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                                        </div>
-                                    </div>
-                                    <span className="text-xs font-semibold text-slate-500 mt-2">{data.month}</span>
-                                </div>
-                            );
-                        })}
+                        <div className="mt-6 pt-5 border-t border-[#E2DDD0]">
+                            <button className="w-full py-2.5 border border-[#E2DDD0] rounded-lg text-sm font-bold text-[#0F1729] hover:border-[#B8935F] hover:text-[#B8935F] transition-colors">
+                                Lihat Laporan Teknis Detail
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                {/* Pie Chart Distribusi Paket (Simulasi List) */}
-                <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-6 dark:bg-slate-950 dark:border-slate-800">
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                        <PieChart className="w-5 h-5 text-emerald-600" /> Distribusi Paket Aktif
-                    </h3>
-                    
-                    <div className="space-y-5">
-                        {packageDistribution.length === 0 ? (
-                            <p className="text-sm text-slate-500 text-center py-8">Belum ada data paket yang aktif.</p>
-                        ) : (
-                            packageDistribution.map((pkg: any, idx: number) => {
-                                // Tentukan warna berdasarkan urutan/nama paket
-                                const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500'];
-                                const colorClass = colors[idx % colors.length];
-                                
-                                // Hitung persentase statis (Simulasi: total aktif asumsi)
-                                const percentage = Math.round((pkg.total / stats.active_schools) * 100) || 0;
-
-                                return (
-                                    <div key={idx} className="space-y-2">
-                                        <div className="flex justify-between items-end text-sm">
-                                            <span className="font-semibold text-slate-700 dark:text-slate-200">{pkg.plan_name}</span>
-                                            <div className="text-right">
-                                                <span className="font-bold text-slate-900 dark:text-white">{pkg.total}</span>
-                                                <span className="text-xs text-slate-400 ml-1">({percentage}%)</span>
-                                            </div>
-                                        </div>
-                                        <div className="w-full bg-slate-100 rounded-full h-2 dark:bg-slate-800">
-                                            <div className={`${colorClass} h-2 rounded-full`} style={{ width: `${percentage}%` }}></div>
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        )}
-                    </div>
-
-                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <p className="text-xs text-slate-500 text-center">Data real-time disinkronisasi dengan modul Pembayaran & Keuangan.</p>
-                    </div>
-                </div>
-
             </div>
         </AuthenticatedLayout>
     );
