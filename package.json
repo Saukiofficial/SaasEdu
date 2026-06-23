@@ -14,6 +14,8 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+        "@ckeditor/ckeditor5-react": "^11.2.0",
         "@inertiajs/react": "^3.4.0",
         "@types/node": "^26.0.0",
         "@types/react": "^19.2.17",

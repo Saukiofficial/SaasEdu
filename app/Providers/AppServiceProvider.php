@@ -71,6 +71,18 @@ use App\Repositories\Contracts\RefundRepositoryInterface;
 use App\Repositories\RefundRepository;
 use App\Repositories\Contracts\BlogRepositoryInterface;
 use App\Repositories\BlogRepository;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Failed;
+use App\Listeners\RecordLoginActivity;
+use App\Repositories\Contracts\LoginActivityRepositoryInterface;
+use App\Repositories\LoginActivityRepository;
+use App\Repositories\Contracts\IpAccessRepositoryInterface;
+use App\Repositories\IpAccessRepository;
+use App\Repositories\Contracts\BrandingRepositoryInterface;
+use App\Repositories\BrandingRepository;
+use App\Repositories\Contracts\LanguageRepositoryInterface;
+use App\Repositories\LanguageRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -110,10 +122,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProspectRepositoryInterface::class, ProspectRepository::class);
         $this->app->bind(RefundRepositoryInterface::class, RefundRepository::class);
         $this->app->bind(BlogRepositoryInterface::class, BlogRepository::class);
+        $this->app->bind(LoginActivityRepositoryInterface::class, LoginActivityRepository::class);
+        $this->app->bind(IpAccessRepositoryInterface::class, IpAccessRepository::class);
+        $this->app->bind(BrandingRepositoryInterface::class, BrandingRepository::class);
+        $this->app->bind(LanguageRepositoryInterface::class, LanguageRepository::class);
     }
 
     public function boot(): void
     {
-        //
+        Event::listen(Login::class, [RecordLoginActivity::class, 'handleLogin']);
+        Event::listen(Failed::class, [RecordLoginActivity::class, 'handleFailedLogin']);
     }
 }

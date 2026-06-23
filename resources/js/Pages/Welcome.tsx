@@ -1,18 +1,93 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { 
     CheckCircle2, Users, BookOpen, FileSpreadsheet, 
     Banknote, PieChart, CalendarDays, ShieldCheck, 
-    Building2, ArrowRight, Award
+    Building2, ArrowRight, Award, Globe, ChevronDown
 } from 'lucide-react';
 
-export default function Welcome({ landingData, packages, app_name }: { landingData: any, packages: any[], app_name: string }) {
+// --- KAMUS TERJEMAHAN (DICTIONARY) ---
+const translations: Record<string, Record<string, string>> = {
+    en: {
+        'Fitur Utama': 'Main Features',
+        'Pencapaian': 'Achievements',
+        'Testimoni': 'Testimonials',
+        'Harga Paket': 'Pricing',
+        'Artikel': 'Articles',
+        'Masuk (Login)': 'Sign In',
+        'Coba Gratis': 'Try for Free',
+        'Coba Gratis Sekarang': 'Try for Free Now',
+        'Jadwalkan Demo': 'Schedule Demo',
+        'Telah dipercaya oleh institusi di seluruh Indonesia': 'Trusted by institutions across Indonesia',
+        'Fitur Modul Lengkap': 'Complete Module Features',
+        'Satu platform untuk semua kebutuhan': 'One platform for all your needs',
+        'Digitalisasi penuh dari pendaftaran siswa hingga kelulusan dalam satu pintu.': 'Full digitalization from student registration to graduation in one place.',
+        'Testimoni Klien': 'Client Testimonials',
+        'Dipercaya oleh institusi terkemuka': 'Trusted by leading institutions',
+        'Daftar Harga': 'Pricing List',
+        'Transparan sesuai kebutuhan Anda': 'Transparent pricing for your needs',
+        'Pilih paket langganan yang cocok dengan skala operasional sekolah Anda.': 'Choose a subscription plan that fits your school\'s operational scale.',
+        'Paling Laris': 'Most Popular',
+        'Mulai Berlangganan': 'Start Subscription',
+        'Artikel & Berita': 'Articles & News',
+        'Informasi Terbaru': 'Latest Information',
+        'Ikuti perkembangan terbaru dan wawasan menarik seputar dunia pendidikan digital.': 'Follow the latest developments and interesting insights around digital education.',
+        'Baca Selengkapnya': 'Read More',
+        'Belum ada artikel yang dipublikasikan saat ini. Silakan kembali lagi nanti!': 'No articles published currently. Please check back later!',
+        'Siap untuk memajukan sekolah Anda?': 'Ready to advance your school?',
+        'Bergabunglah dengan institusi lain yang telah mempercayakan manajemennya kepada kami.': 'Join other institutions that have entrusted their management to us.',
+        'Buat Akun Gratis': 'Create a Free Account',
+        'Produk': 'Products',
+        'Informasi': 'Information',
+        'Pusat Bantuan': 'Help Center',
+        'Hubungi Kami': 'Contact Us',
+        'Kebijakan Privasi': 'Privacy Policy',
+        'Syarat & Ketentuan': 'Terms & Conditions',
+        'Dibuat dengan': 'Made with',
+        'untuk pendidikan': 'for education',
+        'Seluruh hak cipta dilindungi.': 'All rights reserved.',
+        'Pilih Bahasa': 'Select Language',
+        'bulan': 'month',
+        'tahun': 'year',
+        'Maksimal': 'Maximum',
+        'Siswa': 'Students',
+        'Kapasitas': 'Capacity',
+        'Belum ada paket harga yang dikonfigurasi.': 'No pricing packages configured yet.'
+    }
+};
+
+export default function Welcome({ landingData, packages, blogs, app_name }: { landingData: any, packages: any[], blogs?: any[], app_name: string }) {
+    const { props } = usePage<any>();
+    
+    // --- VARIABEL & STATE UNTUK LANGUAGE SWITCHER ---
+    const currentLocale = props?.locale || 'id';
+    const availableLanguages = props?.available_languages || [];
+    const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+
+    const handleLanguageSwitch = (code: string) => {
+        router.post('/language/switch', { code: code }, {
+            preserveScroll: true,
+            onSuccess: () => setIsLangMenuOpen(false)
+        });
+    };
+
+    // Fungsi helper untuk menerjemahkan teks
+    const t = (key: string) => {
+        const localeStr = String(currentLocale).toLowerCase();
+        const langKey = localeStr.startsWith('en') ? 'en' : 'id'; 
+
+        if (langKey !== 'id' && translations[langKey] && translations[langKey][key]) {
+            return translations[langKey][key];
+        }
+        return key; 
+    };
+    // ------------------------------------------------
     
     // Parse CMS Data
     const partners = [1, 2, 3, 4, 5].map(i => ({
         name: landingData[`partner_${i}_name`],
         logo: landingData[`partner_${i}_logo`]
-    })).filter(p => p.name || p.logo); // Hanya tampilkan yang tidak kosong
+    })).filter(p => p.name || p.logo);
 
     const features = [1, 2, 3, 4, 5, 6].map(i => ({
         title: landingData[`feature_${i}_title`],
@@ -48,6 +123,11 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
 
     const formatRupiah = (num: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+    };
+
+    const stripHtml = (html: string) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>?/gm, '');
     };
 
     return (
@@ -86,19 +166,64 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
 
                         {/* Center Links */}
                         <div className="hidden md:flex items-center gap-8">
-                            <a href="#fitur" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Fitur Utama</a>
-                            <a href="#statistik" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Pencapaian</a>
-                            <a href="#testimoni" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Testimoni</a>
-                            <a href="#harga" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Harga Paket</a>
+                            <a href="#fitur" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Fitur Utama')}</a>
+                            <a href="#statistik" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Pencapaian')}</a>
+                            <a href="#testimoni" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Testimoni')}</a>
+                            <a href="#harga" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Harga Paket')}</a>
+                            <a href="#artikel" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Artikel')}</a>
                         </div>
 
-                        {/* CTA Buttons */}
+                        {/* Actions: Lang Switcher & CTA Buttons */}
                         <div className="flex items-center gap-4">
+                            
+                            {/* --- LANGUAGE SWITCHER DROPDOWN --- */}
+                            {availableLanguages.length > 0 && (
+                                <div className="relative hidden sm:block">
+                                    <button 
+                                        onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                                        className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 transition-colors border border-transparent"
+                                    >
+                                        <Globe className="w-4 h-4 text-slate-600" />
+                                        <span className="text-xs font-semibold text-slate-600 uppercase">
+                                            {currentLocale}
+                                        </span>
+                                        <ChevronDown className="w-3.5 h-3.5 text-slate-600" />
+                                    </button>
+
+                                    {isLangMenuOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setIsLangMenuOpen(false)}></div>
+                                            <div className="absolute right-0 mt-2 w-40 bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-2 overflow-hidden">
+                                                <div className="px-3 py-2 border-b border-slate-100 bg-slate-50">
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('Pilih Bahasa')}</p>
+                                                </div>
+                                                {availableLanguages.map((lang: any) => (
+                                                    <button
+                                                        key={lang.code}
+                                                        onClick={() => handleLanguageSwitch(lang.code)}
+                                                        className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
+                                                            currentLocale === lang.code 
+                                                                ? 'bg-blue-50 text-blue-700 font-semibold' 
+                                                                : 'text-slate-600 hover:bg-slate-50'
+                                                        }`}
+                                                    >
+                                                        <span>{lang.name}</span>
+                                                        <span className="text-[9px] font-mono text-gray-400 uppercase border border-gray-200 px-1 rounded">
+                                                            {lang.code}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
                             <Link href="/login" className="hidden sm:block text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
-                                Masuk (Login)
+                                {t('Masuk (Login)')}
                             </Link>
                             <Link href="/register" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-                                Coba Gratis
+                                {t('Coba Gratis')}
                             </Link>
                         </div>
                     </div>
@@ -120,10 +245,10 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 mb-10">
                                 <Link href="/register" className="flex justify-center items-center gap-2 bg-blue-600 text-white px-8 py-3.5 rounded-xl text-base font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
-                                    Coba Gratis Sekarang <ArrowRight className="w-5 h-5" />
+                                    {t('Coba Gratis Sekarang')} <ArrowRight className="w-5 h-5" />
                                 </Link>
                                 <button className="flex justify-center items-center gap-2 bg-white text-slate-700 border border-slate-200 px-8 py-3.5 rounded-xl text-base font-semibold hover:bg-slate-50 transition-all">
-                                    Jadwalkan Demo
+                                    {t('Jadwalkan Demo')}
                                 </button>
                             </div>
                         </div>
@@ -163,7 +288,7 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
             {partners.length > 0 && (
                 <section className="py-10 border-y border-slate-100 bg-slate-50/50 overflow-hidden">
                     <div className="max-w-7xl mx-auto text-center mb-6">
-                        <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Telah dipercaya oleh institusi di seluruh Indonesia</p>
+                        <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">{t('Telah dipercaya oleh institusi di seluruh Indonesia')}</p>
                     </div>
                     {/* Marquee Wrapper */}
                     <div className="relative w-full overflow-hidden flex items-center h-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
@@ -198,9 +323,9 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
             {/* --- FEATURES SECTION (DINAMIS DARI CMS) --- */}
             <section id="fitur" className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">Fitur Modul Lengkap</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Satu platform untuk semua kebutuhan</h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">Digitalisasi penuh dari pendaftaran siswa hingga kelulusan dalam satu pintu.</p>
+                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">{t('Fitur Modul Lengkap')}</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">{t('Satu platform untuk semua kebutuhan')}</h2>
+                    <p className="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">{t('Digitalisasi penuh dari pendaftaran siswa hingga kelulusan dalam satu pintu.')}</p>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                         {features.map((feature, idx) => {
@@ -245,8 +370,8 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
             {/* --- TESTIMONIALS (DINAMIS DARI CMS) --- */}
             <section id="testimoni" className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">Testimoni Klien</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-16">Dipercaya oleh institusi terkemuka</h2>
+                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">{t('Testimoni Klien')}</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-16">{t('Dipercaya oleh institusi terkemuka')}</h2>
 
                     <div className="grid md:grid-cols-3 gap-8 text-left">
                         {testimonials.map((testi, idx) => (
@@ -270,9 +395,9 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
             {/* --- PRICING SECTION (TERHUBUNG KE DATABASE SUBSCRIPTION_PACKAGES) --- */}
             <section id="harga" className="py-24 bg-slate-50 border-t border-slate-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">Daftar Harga</span>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Transparan sesuai kebutuhan Anda</h2>
-                    <p className="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">Pilih paket langganan yang cocok dengan skala operasional sekolah Anda.</p>
+                    <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">{t('Daftar Harga')}</span>
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">{t('Transparan sesuai kebutuhan Anda')}</h2>
+                    <p className="text-slate-500 max-w-2xl mx-auto mb-16 text-lg">{t('Pilih paket langganan yang cocok dengan skala operasional sekolah Anda.')}</p>
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left items-center">
                         {packages && packages.length > 0 ? (
@@ -280,7 +405,7 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                                 <div key={pkg.id} className={`bg-white rounded-3xl p-8 border ${pkg.is_popular ? 'border-blue-600 shadow-xl relative transform md:-translate-y-4 border-2' : 'border-slate-200 shadow-sm'}`}>
                                     {pkg.is_popular && (
                                         <div className="absolute top-0 right-8 transform -translate-y-1/2">
-                                            <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Paling Laris</span>
+                                            <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('Paling Laris')}</span>
                                         </div>
                                     )}
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">{pkg.name}</h3>
@@ -289,31 +414,78 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                                             {formatRupiah(pkg.price)}
                                         </span>
                                         <span className="text-sm font-medium text-slate-500">
-                                            /{pkg.billing_cycle === 'monthly' ? 'bulan' : pkg.billing_cycle === 'yearly' ? 'tahun' : 'lifetime'}
+                                            /{pkg.billing_cycle === 'monthly' ? t('bulan') : pkg.billing_cycle === 'yearly' ? t('tahun') : t('lifetime')}
                                         </span>
                                     </div>
                                     <p className="text-sm text-slate-500 mb-6 min-h-[40px]">{pkg.description}</p>
                                     
                                     <ul className="space-y-4 mb-8 text-sm text-slate-700">
-                                        <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> Maksimal <strong>{pkg.max_students} Siswa</strong></li>
-                                        <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> Kapasitas <strong>{(pkg.storage_limit_mb / 1024).toFixed(1)} GB</strong> Storage</li>
-                                        {/* Render 3 fitur pertama dari array JSON features */}
+                                        <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> {t('Maksimal')} <strong>{pkg.max_students} {t('Siswa')}</strong></li>
+                                        <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> {t('Kapasitas')} <strong>{(pkg.storage_limit_mb / 1024).toFixed(1)} GB</strong> Storage</li>
                                         {pkg.features && Array.isArray(pkg.features) && pkg.features.slice(0, 3).map((feat: string, i: number) => (
                                             <li key={i} className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" /> <span className="leading-tight">{feat}</span></li>
                                         ))}
                                     </ul>
                                     
                                     <Link href="/register" className={`w-full flex items-center justify-center py-3 px-4 rounded-xl font-bold transition-all ${pkg.is_popular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30' : 'border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
-                                        Mulai Berlangganan
+                                        {t('Mulai Berlangganan')}
                                     </Link>
                                 </div>
                             ))
                         ) : (
                             <div className="col-span-3 text-center p-8">
-                                <p className="text-slate-500">Belum ada paket harga yang dikonfigurasi.</p>
+                                <p className="text-slate-500">{t('Belum ada paket harga yang dikonfigurasi.')}</p>
                             </div>
                         )}
                     </div>
+                </div>
+            </section>
+
+            {/* --- LATEST BLOGS / ARTIKEL SECTION --- */}
+            <section id="artikel" className="py-24 bg-white border-t border-slate-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <span className="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-600 text-xs font-bold tracking-widest uppercase mb-4">{t('Artikel & Berita')}</span>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">{t('Informasi Terbaru')}</h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-lg">{t('Ikuti perkembangan terbaru dan wawasan menarik seputar dunia pendidikan digital.')}</p>
+                    </div>
+
+                    {blogs && blogs.length > 0 ? (
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {blogs.map((blog: any) => (
+                                <div key={blog.id} className="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-slate-200 transition-all duration-300 group flex flex-col">
+                                    <div className="aspect-video w-full overflow-hidden bg-slate-50 relative">
+                                        {blog.thumbnail ? (
+                                            <img src={blog.thumbnail} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <BookOpen className="w-12 h-12 text-slate-300" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <div className="text-xs font-semibold text-blue-600 mb-3 uppercase tracking-wider">
+                                            {new Date(blog.created_at).toLocaleDateString(currentLocale, { day: 'numeric', month: 'long', year: 'numeric' })}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                            {blog.title}
+                                        </h3>
+                                        <p className="text-slate-500 text-sm mb-6 line-clamp-3 leading-relaxed flex-1">
+                                            {stripHtml(blog.content).substring(0, 150)}...
+                                        </p>
+                                        <Link href={`#`} className="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors mt-auto">
+                                            {t('Baca Selengkapnya')} <ArrowRight className="w-4 h-4 ml-1" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center p-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 max-w-2xl mx-auto">
+                            <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                            <p className="text-slate-500">{t('Belum ada artikel yang dipublikasikan saat ini. Silakan kembali lagi nanti!')}</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -322,11 +494,11 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl shadow-blue-900/20 text-center md:text-left">
                         <div>
-                            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">Siap untuk memajukan sekolah Anda?</h2>
-                            <p className="text-blue-100 text-lg">Bergabunglah dengan institusi lain yang telah mempercayakan manajemennya kepada kami.</p>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">{t('Siap untuk memajukan sekolah Anda?')}</h2>
+                            <p className="text-blue-100 text-lg">{t('Bergabunglah dengan institusi lain yang telah mempercayakan manajemennya kepada kami.')}</p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-                            <Link href="/register" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg">Buat Akun Gratis</Link>
+                            <Link href="/register" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg">{t('Buat Akun Gratis')}</Link>
                         </div>
                     </div>
                 </div>
@@ -346,7 +518,7 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                             </p>
                             <div className="flex gap-4 text-slate-400">
                                 <a href="#" className="hover:text-white transition-colors" aria-label="Facebook">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>
                                 </a>
                                 <a href="#" className="hover:text-white transition-colors" aria-label="Twitter">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
@@ -358,28 +530,29 @@ export default function Welcome({ landingData, packages, app_name }: { landingDa
                         </div>
 
                         <div>
-                            <h4 className="text-white font-semibold mb-6">Produk</h4>
+                            <h4 className="text-white font-semibold mb-6">{t('Produk')}</h4>
                             <ul className="space-y-4 text-sm text-slate-400">
-                                <li><a href="#fitur" className="hover:text-blue-400 transition-colors">Fitur</a></li>
-                                <li><a href="#harga" className="hover:text-blue-400 transition-colors">Harga</a></li>
+                                <li><a href="#fitur" className="hover:text-blue-400 transition-colors">{t('Fitur Utama')}</a></li>
+                                <li><a href="#harga" className="hover:text-blue-400 transition-colors">{t('Harga Paket')}</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-white font-semibold mb-6">Informasi</h4>
+                            <h4 className="text-white font-semibold mb-6">{t('Informasi')}</h4>
                             <ul className="space-y-4 text-sm text-slate-400">
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Pusat Bantuan</a></li>
-                                <li><a href="#" className="hover:text-blue-400 transition-colors">Hubungi Kami</a></li>
+                                <li><a href="#artikel" className="hover:text-blue-400 transition-colors">{t('Artikel & Berita')}</a></li>
+                                <li><a href="#" className="hover:text-blue-400 transition-colors">{t('Pusat Bantuan')}</a></li>
+                                <li><a href="#" className="hover:text-blue-400 transition-colors">{t('Hubungi Kami')}</a></li>
                             </ul>
                         </div>
                     </div>
 
                     <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-                        <p>© 2026 {app_name}. Seluruh hak cipta dilindungi.</p>
+                        <p>© 2026 {app_name}. {t('Seluruh hak cipta dilindungi.')}</p>
                         <div className="flex gap-6">
-                            <a href="#" className="hover:text-white transition-colors">Kebijakan Privasi</a>
-                            <a href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</a>
+                            <a href="#" className="hover:text-white transition-colors">{t('Kebijakan Privasi')}</a>
+                            <a href="#" className="hover:text-white transition-colors">{t('Syarat & Ketentuan')}</a>
                         </div>
-                        <p className="flex items-center gap-1">Dibuat dengan <span className="text-red-500">♥</span> untuk pendidikan</p>
+                        <p className="flex items-center gap-1">{t('Dibuat dengan')} <span className="text-red-500">♥</span> {t('untuk pendidikan')}</p>
                     </div>
                 </div>
             </footer>

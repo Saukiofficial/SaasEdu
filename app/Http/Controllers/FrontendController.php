@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\SettingService;
 use App\Models\SubscriptionPackage;
+use App\Models\Blog;
 
 class FrontendController extends Controller
 {
@@ -41,9 +42,13 @@ class FrontendController extends Controller
                                      ->orderBy('price', 'asc')
                                      ->get();
 
+        // Ambil 3 artikel blog terbaru yang statusnya published
+        $blogs = Blog::where('status', 'published')->latest()->take(3)->get();
+
         return Inertia::render('Welcome', [
             'landingData' => $landingData,
             'packages' => $packages,
+            'blogs' => $blogs,
             'app_name' => $settings['app_name'] ?? 'AkademiaOS'
         ]);
     }

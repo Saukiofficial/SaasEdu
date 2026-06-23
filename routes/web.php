@@ -17,6 +17,7 @@ use App\Http\Controllers\Finance\PaymentController;
 use App\Http\Controllers\Lms\StudyMaterialController;
 use App\Http\Controllers\Lms\ExamController;
 use App\Http\Controllers\FrontendController;
+use App\Http\Controllers\LanguageSwitchController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,6 +26,7 @@ Route::get('/', [FrontendController::class, 'welcome'])->name('home');
 // --- PUBLIC ROUTES ---
 Route::get('/ppdb/{school}', [PPDBController::class, 'showLanding'])->name('ppdb.landing');
 Route::post('/ppdb/{school}', [PPDBController::class, 'store'])->name('ppdb.store');
+Route::post('/language/switch', [LanguageSwitchController::class, 'switch'])->name('language.switch');
 
 // --- GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
@@ -56,8 +58,17 @@ Route::middleware('auth')->group(function () {
         // Tambahkan baris ini untuk Modul Laporan & Analitik SaaS
         Route::get('/reports', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'index'])->name('reports.index');
 
+        // --- SETTINGS & BRANDING ---
         Route::get('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [\App\Http\Controllers\SuperAdmin\SettingController::class, 'update'])->name('settings.update');
+        Route::get('branding', [\App\Http\Controllers\SuperAdmin\BrandingController::class, 'index'])->name('branding.index');
+        Route::post('branding', [\App\Http\Controllers\SuperAdmin\BrandingController::class, 'update'])->name('branding.update');
+        Route::get('localization', [\App\Http\Controllers\SuperAdmin\LocalizationController::class, 'index'])->name('localization.index');
+        Route::post('localization', [\App\Http\Controllers\SuperAdmin\LocalizationController::class, 'store'])->name('localization.store');
+        Route::put('localization/{language}', [\App\Http\Controllers\SuperAdmin\LocalizationController::class, 'update'])->name('localization.update');
+        Route::put('localization/{language}/default', [\App\Http\Controllers\SuperAdmin\LocalizationController::class, 'setAsDefault'])->name('localization.default');
+        Route::delete('localization/{language}', [\App\Http\Controllers\SuperAdmin\LocalizationController::class, 'destroy'])->name('localization.destroy');
+
 
         Route::resource('tickets', \App\Http\Controllers\SuperAdmin\TicketController::class)->only(['index', 'update', 'destroy']);
             
@@ -79,10 +90,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('subscription-invoices', \App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class)->only(['index', 'store', 'destroy']);
         Route::put('subscription-invoices/{invoice}/pay', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'markAsPaid'])->name('subscription-invoices.pay');
         Route::put('subscription-invoices/{invoice}/cancel', [\App\Http\Controllers\SuperAdmin\SubscriptionInvoiceController::class, 'cancel'])->name('subscription-invoices.cancel');
-
         Route::get('refunds', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'index'])->name('refunds.index');
-Route::put('refunds/{refund}/status', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'updateStatus'])->name('refunds.update-status');
-Route::delete('refunds/{refund}', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'destroy'])->name('refunds.destroy');
+        Route::put('refunds/{refund}/status', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'updateStatus'])->name('refunds.update-status');
+        Route::delete('refunds/{refund}', [\App\Http\Controllers\SuperAdmin\RefundController::class, 'destroy'])->name('refunds.destroy');
 
         // --- TENANT MANAGEMENT Module ---
         Route::get('tenant-settings', [\App\Http\Controllers\SuperAdmin\TenantSettingController::class, 'index'])->name('tenant-settings.index');
@@ -106,7 +116,13 @@ Route::delete('refunds/{refund}', [\App\Http\Controllers\SuperAdmin\RefundContro
 
         // --- SECURITY CENTER Module ---
         Route::get('audit-logs', [\App\Http\Controllers\SuperAdmin\AuditLogController::class, 'index'])->name('audit-logs.index');
-
+        Route::get('login-activities', [\App\Http\Controllers\SuperAdmin\LoginActivityController::class, 'index'])->name('login-activities.index');
+        Route::delete('login-activities/clear', [\App\Http\Controllers\SuperAdmin\LoginActivityController::class, 'destroy'])->name('login-activities.clear');
+        Route::get('ip-accesses', [\App\Http\Controllers\SuperAdmin\IpAccessController::class, 'index'])->name('ip-accesses.index');
+        Route::post('ip-accesses', [\App\Http\Controllers\SuperAdmin\IpAccessController::class, 'store'])->name('ip-accesses.store');
+        Route::put('ip-accesses/{ipAccess}', [\App\Http\Controllers\SuperAdmin\IpAccessController::class, 'update'])->name('ip-accesses.update');
+        Route::put('ip-accesses/{ipAccess}/toggle-status', [\App\Http\Controllers\SuperAdmin\IpAccessController::class, 'toggleStatus'])->name('ip-accesses.toggle-status');
+        Route::delete('ip-accesses/{ipAccess}', [\App\Http\Controllers\SuperAdmin\IpAccessController::class, 'destroy'])->name('ip-accesses.destroy');
 
 
     });
