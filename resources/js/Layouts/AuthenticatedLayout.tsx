@@ -119,6 +119,17 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const isSuperAdmin = user.school_id === null;
 
+    // --- STATE UNTUK COLLAPSE / EXPAND GRUP MENU SIDEBAR ---
+    // Menyimpan judul grup yang sedang di-collapse (disembunyikan itemnya)
+    const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+    const toggleGroup = (title: string) => {
+        setCollapsedGroups((prev) => ({
+            ...prev,
+            [title]: !prev[title],
+        }));
+    };
+
     // --- MENU SUPER ADMIN ---
     const superAdminGroups = [
         {
@@ -167,6 +178,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
             title: 'CONTENT MANAGEMENT',
             items: [
                 { name: 'Landing Page', href: '/super-admin/landing-page', icon: LayoutTemplate },
+                { name: 'Produk & Solusi', href: '/super-admin/landing-products', icon: Package },
                 { name: 'Blog', href: '/super-admin/blogs', icon: FileEdit },
                 { name: 'FAQ', href: '/super-admin/faqs', icon: HelpCircle },
                 { name: 'Broadcast', href: '/super-admin/announcements', icon: Megaphone },
@@ -322,31 +334,41 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
 
                 {/* MENU */}
                 <div className="flex-1 overflow-y-auto py-6 px-4 space-y-7 custom-scrollbar">
-                    {menuGroups.map((group, idx) => (
-                        <div key={idx} className="space-y-1">
-                            <div className="px-3 pb-2 text-[10px] font-semibold text-[#D4AF7A]/70 uppercase tracking-[0.18em]">
-                                {group.title}
+                    {menuGroups.map((group, idx) => {
+                        const isCollapsed = !!collapsedGroups[group.title];
+                        return (
+                            <div key={idx} className="space-y-1">
+                                <button
+                                    type="button"
+                                    onClick={() => toggleGroup(group.title)}
+                                    className="w-full flex items-center justify-between px-3 pb-2 text-[10px] font-semibold text-[#D4AF7A]/70 uppercase tracking-[0.18em] hover:text-[#D4AF7A] transition-colors"
+                                >
+                                    <span>{group.title}</span>
+                                    <ChevronDown
+                                        className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                                    />
+                                </button>
+                                {!isCollapsed && group.items.map((item) => {
+                                    const isActive = currentUrl !== '' && currentUrl.startsWith(item.href) && item.href !== '#';
+                                    return (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            preserveScroll
+                                            className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
+                                                isActive
+                                                ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
+                                                : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'
+                                            }`}
+                                        >
+                                            <item.icon className={`w-4 h-4 mr-3 shrink-0 transition-colors ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593] group-hover:text-[#D4AF7A]'}`} />
+                                            <span className="truncate">{item.name}</span>
+                                        </Link>
+                                    );
+                                })}
                             </div>
-                            {group.items.map((item) => {
-                                const isActive = currentUrl !== '' && currentUrl.startsWith(item.href) && item.href !== '#';
-                                return (
-                                    <Link
-                                        key={item.name}
-                                        href={item.href}
-                                        preserveScroll
-                                        className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
-                                            isActive
-                                            ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
-                                            : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'
-                                        }`}
-                                    >
-                                        <item.icon className={`w-4 h-4 mr-3 shrink-0 transition-colors ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593] group-hover:text-[#D4AF7A]'}`} />
-                                        <span className="truncate">{item.name}</span>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
 
                 {/* ACCREDITATION / STATUS WIDGET (Ditampilkan khusus klien) */}
@@ -393,31 +415,41 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                             <button onClick={() => setIsMobileMenuOpen(false)}><X className="w-5 h-5 text-white" /></button>
                         </div>
                         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-                            {menuGroups.map((group, idx) => (
-                                <div key={idx} className="space-y-1">
-                                    <div className="px-3 pb-2 text-[10px] font-semibold text-[#D4AF7A]/70 uppercase tracking-[0.18em]">
-                                        {group.title}
-                                    </div>
-                                    {group.items.map((item) => {
-                                        const isActive = currentUrl !== '' && currentUrl.startsWith(item.href) && item.href !== '#';
-                                        return (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            preserveScroll
-                                            className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
-                                                isActive
-                                                ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
-                                                : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'
-                                            }`}
+                            {menuGroups.map((group, idx) => {
+                                const isCollapsed = !!collapsedGroups[group.title];
+                                return (
+                                    <div key={idx} className="space-y-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleGroup(group.title)}
+                                            className="w-full flex items-center justify-between px-3 pb-2 text-[10px] font-semibold text-[#D4AF7A]/70 uppercase tracking-[0.18em] hover:text-[#D4AF7A] transition-colors"
                                         >
-                                            <item.icon className={`w-4 h-4 mr-3 shrink-0 transition-colors ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593] group-hover:text-[#D4AF7A]'}`} />
-                                            <span className="truncate">{item.name}</span>
-                                        </Link>
-                                        );
-                                    })}
-                                </div>
-                            ))}
+                                            <span>{group.title}</span>
+                                            <ChevronDown
+                                                className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                                            />
+                                        </button>
+                                        {!isCollapsed && group.items.map((item) => {
+                                            const isActive = currentUrl !== '' && currentUrl.startsWith(item.href) && item.href !== '#';
+                                            return (
+                                            <Link
+                                                key={item.name}
+                                                href={item.href}
+                                                preserveScroll
+                                                className={`flex items-center px-3 py-2.5 rounded-md text-[13.5px] font-medium transition-all duration-150 group ${
+                                                    isActive
+                                                    ? 'bg-[#1B2742] text-white shadow-[inset_2px_0_0_0_#D4AF7A]'
+                                                    : 'text-[#A9B2C7] hover:bg-white/5 hover:text-white'
+                                                }`}
+                                            >
+                                                <item.icon className={`w-4 h-4 mr-3 shrink-0 transition-colors ${isActive ? 'text-[#D4AF7A]' : 'text-[#6B7593] group-hover:text-[#D4AF7A]'}`} />
+                                                <span className="truncate">{item.name}</span>
+                                            </Link>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })}
                         </div>
                         <div className="p-4 border-t border-[#B8935F]/15 shrink-0">
                             <button onClick={() => router.post('/logout')} className="w-full text-left text-sm font-semibold text-red-300 flex items-center hover:text-red-200">

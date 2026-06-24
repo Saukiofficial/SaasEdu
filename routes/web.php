@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [FrontendController::class, 'welcome'])->name('home');
+Route::get('/product/{slug}', [FrontendController::class, 'productDetail'])->name('product.detail');
 
 // --- PUBLIC ROUTES ---
 Route::get('/ppdb/{school}', [PPDBController::class, 'showLanding'])->name('ppdb.landing');
@@ -112,6 +113,11 @@ Route::middleware('auth')->group(function () {
         Route::post('blogs', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'store'])->name('blogs.store');
         Route::put('blogs/{blog}', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'update'])->name('blogs.update');
         Route::delete('blogs/{blog}', [\App\Http\Controllers\SuperAdmin\BlogController::class, 'destroy'])->name('blogs.destroy');
+        Route::get('landing-products', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'index'])->name('landing-products.index');
+        Route::post('landing-products', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'store'])->name('landing-products.store');
+        Route::put('landing-products/{landingProduct}', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'update'])->name('landing-products.update');
+        Route::delete('landing-products/{landingProduct}', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'destroy'])->name('landing-products.destroy');
+
 
 
         // --- SECURITY CENTER Module ---

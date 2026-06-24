@@ -9,6 +9,7 @@ import {
 // --- KAMUS TERJEMAHAN (DICTIONARY) ---
 const translations: Record<string, Record<string, string>> = {
     en: {
+        'Produk': 'Products',
         'Fitur Utama': 'Main Features',
         'Pencapaian': 'Achievements',
         'Testimoni': 'Testimonials',
@@ -19,6 +20,7 @@ const translations: Record<string, Record<string, string>> = {
         'Coba Gratis Sekarang': 'Try for Free Now',
         'Jadwalkan Demo': 'Schedule Demo',
         'Telah dipercaya oleh institusi di seluruh Indonesia': 'Trusted by institutions across Indonesia',
+        'Produk & Solusi': 'Products & Solutions',
         'Fitur Modul Lengkap': 'Complete Module Features',
         'Satu platform untuk semua kebutuhan': 'One platform for all your needs',
         'Digitalisasi penuh dari pendaftaran siswa hingga kelulusan dalam satu pintu.': 'Full digitalization from student registration to graduation in one place.',
@@ -37,7 +39,6 @@ const translations: Record<string, Record<string, string>> = {
         'Siap untuk memajukan sekolah Anda?': 'Ready to advance your school?',
         'Bergabunglah dengan institusi lain yang telah mempercayakan manajemennya kepada kami.': 'Join other institutions that have entrusted their management to us.',
         'Buat Akun Gratis': 'Create a Free Account',
-        'Produk': 'Products',
         'Informasi': 'Information',
         'Pusat Bantuan': 'Help Center',
         'Hubungi Kami': 'Contact Us',
@@ -56,7 +57,7 @@ const translations: Record<string, Record<string, string>> = {
     }
 };
 
-export default function Welcome({ landingData, packages, blogs, app_name }: { landingData: any, packages: any[], blogs?: any[], app_name: string }) {
+export default function Welcome({ landingData, packages, blogs, products, app_name }: { landingData: any, packages: any[], blogs?: any[], products?: any[], app_name: string }) {
     const { props } = usePage<any>();
     
     // --- VARIABEL & STATE UNTUK LANGUAGE SWITCHER ---
@@ -166,9 +167,9 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
 
                         {/* Center Links */}
                         <div className="hidden md:flex items-center gap-8">
+                            <a href="#produk" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Produk')}</a>
                             <a href="#fitur" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Fitur Utama')}</a>
                             <a href="#statistik" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Pencapaian')}</a>
-                            <a href="#testimoni" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Testimoni')}</a>
                             <a href="#harga" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Harga Paket')}</a>
                             <a href="#artikel" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">{t('Artikel')}</a>
                         </div>
@@ -290,10 +291,8 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                     <div className="max-w-7xl mx-auto text-center mb-6">
                         <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider">{t('Telah dipercaya oleh institusi di seluruh Indonesia')}</p>
                     </div>
-                    {/* Marquee Wrapper */}
                     <div className="relative w-full overflow-hidden flex items-center h-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
                         <div className="animate-marquee gap-16 px-8 items-center">
-                            {/* Render original list */}
                             {partners.map((partner, index) => (
                                 <div key={index} className="flex items-center gap-3 shrink-0">
                                     {partner.logo ? (
@@ -304,7 +303,6 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                                     {partner.name && <span className="text-xl font-serif font-bold text-slate-800">{partner.name}</span>}
                                 </div>
                             ))}
-                            {/* Duplicate list to create seamless loop */}
                             {partners.map((partner, index) => (
                                 <div key={`dup-${index}`} className="flex items-center gap-3 shrink-0">
                                     {partner.logo ? (
@@ -319,6 +317,44 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                     </div>
                 </section>
             )}
+
+            {/* --- PRODUCT SECTION (DAFTAR PRODUK & SOLUSI) --- */}
+            <section id="produk" className="py-24 bg-[#F8FAFC]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">{t('Produk & Solusi')}</h2>
+                        <p className="text-slate-500 max-w-3xl mx-auto text-lg">
+                            {app_name} menghadirkan berbagai solusi untuk membantu transformasi layanan secara digital.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {products && products.length > 0 ? (
+                            products.map((prod: any) => (
+                                <div key={prod.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-slate-100 flex flex-col">
+                                    <div className="h-48 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                                        {prod.thumbnail_url ? (
+                                            <img src={prod.thumbnail_url} alt={prod.name} className="w-full h-full object-cover mix-blend-multiply opacity-90" />
+                                        ) : (
+                                            <span className="text-slate-400">No Image</span>
+                                        )}
+                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 text-xs font-bold text-slate-800 rounded-lg">Pilihan Terbaik</div>
+                                    </div>
+                                    <div className="p-8 text-center flex flex-col flex-1">
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3">{prod.name}</h3>
+                                        <p className="text-slate-500 mb-8 flex-1 text-sm line-clamp-3">{prod.subtitle}</p>
+                                        <Link href={`/product/${prod.slug}`} className="inline-block w-full py-3 px-4 border border-blue-600 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors">
+                                            Selengkapnya
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="col-span-3 text-center text-slate-500 py-10">Produk sedang disiapkan.</div>
+                        )}
+                    </div>
+                </div>
+            </section>
 
             {/* --- FEATURES SECTION (DINAMIS DARI CMS) --- */}
             <section id="fitur" className="py-24 bg-white">
@@ -418,7 +454,7 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                                         </span>
                                     </div>
                                     <p className="text-sm text-slate-500 mb-6 min-h-[40px]">{pkg.description}</p>
-                                    
+
                                     <ul className="space-y-4 mb-8 text-sm text-slate-700">
                                         <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> {t('Maksimal')} <strong>{pkg.max_students} {t('Siswa')}</strong></li>
                                         <li className="flex items-center gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" /> {t('Kapasitas')} <strong>{(pkg.storage_limit_mb / 1024).toFixed(1)} GB</strong> Storage</li>
@@ -426,8 +462,8 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                                             <li key={i} className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" /> <span className="leading-tight">{feat}</span></li>
                                         ))}
                                     </ul>
-                                    
-                                    <Link href="/register" className={`w-full flex items-center justify-center py-3 px-4 rounded-xl font-bold transition-all ${pkg.is_popular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30' : 'border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
+
+                                    <Link href={`/register?package_id=${pkg.id}`} className={`w-full flex items-center justify-center py-3 px-4 rounded-xl font-bold transition-all ${pkg.is_popular ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/30' : 'border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}>
                                         {t('Mulai Berlangganan')}
                                     </Link>
                                 </div>
@@ -532,6 +568,7 @@ export default function Welcome({ landingData, packages, blogs, app_name }: { la
                         <div>
                             <h4 className="text-white font-semibold mb-6">{t('Produk')}</h4>
                             <ul className="space-y-4 text-sm text-slate-400">
+                                <li><a href="#produk" className="hover:text-blue-400 transition-colors">{t('Produk & Solusi')}</a></li>
                                 <li><a href="#fitur" className="hover:text-blue-400 transition-colors">{t('Fitur Utama')}</a></li>
                                 <li><a href="#harga" className="hover:text-blue-400 transition-colors">{t('Harga Paket')}</a></li>
                             </ul>

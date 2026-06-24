@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Services\SettingService;
 use App\Models\SubscriptionPackage;
-use App\Models\Blog;
+use App\Models\LandingProduct;
 
 class FrontendController extends Controller
 {
@@ -42,13 +42,26 @@ class FrontendController extends Controller
                                      ->orderBy('price', 'asc')
                                      ->get();
 
-        // Ambil 3 artikel blog terbaru yang statusnya published
-        $blogs = Blog::where('status', 'published')->latest()->take(3)->get();
+        // AMBIL DATA PRODUK YANG AKTIF
+        $products = LandingProduct::where('is_active', true)->get();
 
         return Inertia::render('Welcome', [
             'landingData' => $landingData,
             'packages' => $packages,
-            'blogs' => $blogs,
+            'products' => $products, // Kirim ke Frontend
+            'app_name' => $settings['app_name'] ?? 'AkademiaOS'
+        ]);
+    }
+
+    public function productDetail(Request $request, $slug, SettingService $settingService)
+    {
+        $settings = $settingService->getAllSettingsAsKeyValue();
+        
+        // AMBIL DETAIL PRODUK BERDASARKAN SLUG
+        $product = LandingProduct::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        
+        return Inertia::render('ProductDetail', [
+            'product' => $product,
             'app_name' => $settings['app_name'] ?? 'AkademiaOS'
         ]);
     }

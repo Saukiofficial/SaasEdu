@@ -83,6 +83,8 @@ use App\Repositories\Contracts\BrandingRepositoryInterface;
 use App\Repositories\BrandingRepository;
 use App\Repositories\Contracts\LanguageRepositoryInterface;
 use App\Repositories\LanguageRepository;
+use App\Repositories\Contracts\LandingProductRepositoryInterface;
+use App\Repositories\LandingProductRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -126,6 +128,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IpAccessRepositoryInterface::class, IpAccessRepository::class);
         $this->app->bind(BrandingRepositoryInterface::class, BrandingRepository::class);
         $this->app->bind(LanguageRepositoryInterface::class, LanguageRepository::class);
+        $this->app->bind(LandingProductRepositoryInterface::class, LandingProductRepository::class);
     }
 
     public function boot(): void
