@@ -3,52 +3,54 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\AcademicYearRepositoryInterface;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class AcademicYearService extends BaseService
+class AcademicYearService
 {
-    protected AcademicYearRepositoryInterface $academicYearRepository;
+    public function __construct(
+        protected AcademicYearRepositoryInterface $academicYearRepository
+    ) {}
 
-    public function __construct(AcademicYearRepositoryInterface $academicYearRepository)
+    public function getAcademicYearsPaginated(string $schoolId, array $filters = [])
     {
-        $this->academicYearRepository = $academicYearRepository;
+        $search = $filters['search'] ?? null;
+        $perPage = $filters['per_page'] ?? 10;
+
+        return $this->academicYearRepository->getPaginatedBySchool($schoolId, $perPage, $search);
     }
 
-    public function getAll()
+    public function createAcademicYear(string $schoolId, array $data)
     {
-        // Trait BelongsToTenant otomatis memfilter berdasarkan school_id
-        return $this->academicYearRepository->all();
-    }
+        $data['school_id'] = $schoolId;
+        
+        return DB::transaction(function () use ($schoolId, $data) {
+            $academicYear = $this->academicYearRepository->create($data);
 
-    public function createAcademicYear(array $data)
-    {
-        return DB::transaction(function () use ($data) {
-            $schoolId = Auth::user()->school_id;
-
-            if (isset($data['is_active']) && $data['is_active']) {
-                $this->academicYearRepository->deactivateAllForSchool($schoolId);
+            // Jika diset sebagai aktif, nonaktifkan yang lain
+            if (!empty($data['is_active']) && $data['is_active']) {
+                $this->academicYearRepository->deactivateAllOther($schoolId, $academicYear->id);
             }
 
-            return $this->academicYearRepository->create($data);
+            return $academicYear;
         });
     }
 
-    public function updateAcademicYear(string $id, array $data)
+    public function updateAcademicYear(string $id, string $schoolId, array $data)
     {
-        return DB::transaction(function () use ($id, $data) {
-            $schoolId = Auth::user()->school_id;
+        return DB::transaction(function () use ($id, $schoolId, $data) {
+            $updated = $this->academicYearRepository->update($id, $schoolId, $data);
 
-            if (isset($data['is_active']) && $data['is_active']) {
-                $this->academicYearRepository->deactivateAllForSchool($schoolId);
+            // Jika diset sebagai aktif, nonaktifkan yang lain
+            if (!empty($data['is_active']) && $data['is_active']) {
+                $this->academicYearRepository->deactivateAllOther($schoolId, $id);
             }
 
-            return $this->academicYearRepository->update($id, $data);
+            return $updated;
         });
     }
 
-    public function deleteAcademicYear(string $id)
+    public function deleteAcademicYear(string $id, string $schoolId)
     {
-        return $this->academicYearRepository->delete($id);
+        return $this->academicYearRepository->delete($id, $schoolId);
     }
 }

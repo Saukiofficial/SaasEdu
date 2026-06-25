@@ -2,7 +2,15 @@
 
 namespace App\Repositories\Contracts;
 
-interface StudentRepositoryInterface extends BaseRepositoryInterface
+use App\Models\Student;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+interface StudentRepositoryInterface
 {
-    public function getPaginatedWithClassroom(int $perPage = 10);
+    // Ditambahkan filter opsional untuk classroomId
+    public function getPaginatedBySchool(string $schoolId, int $perPage = 10, ?string $search = null, ?string $classroomId = null): LengthAwarePaginator;
+    public function findByIdAndSchool(string $id, string $schoolId): ?Student;
+    public function create(array $data): Student;
+    public function update(string $id, string $schoolId, array $data): bool;
+    public function delete(string $id, string $schoolId): bool;
 }

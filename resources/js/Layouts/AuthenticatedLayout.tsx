@@ -235,34 +235,35 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         {
             title: 'MASTER DATA',
             items: [
-                { name: t('Profil Sekolah'), href: '#', icon: Building },
-                { name: t('Jurusan'), href: '#', icon: BookOpen },
-                { name: t('Kelas & Ruangan'), href: '#', icon: School },
-                { name: t('Mata Pelajaran'), href: '#', icon: FileText },
-                { name: t('Tahun Ajaran'), href: '#', icon: CalendarDays },
+                { name: t('Profil Sekolah'), href: '/master-data/school-profile', icon: Building },
+                { name: t('Jurusan'), href: '/master-data/majors', icon: BookOpen },
+                { name: t('Kelas & Ruangan'), href: '/master-data/classrooms', icon: School },
+                { name: t('Mata Pelajaran'), href: '/master-data/subjects', icon: FileText },
+                { name: t('Tahun Ajaran'), href: '/master-data/academic-years', icon: CalendarDays },
             ]
         },
         {
             title: 'SISWA',
             items: [
                 { name: t('Data Siswa'), href: '/students', icon: GraduationCap },
-                { name: t('Orang Tua'), href: '#', icon: Users },
-                { name: t('Mutasi'), href: '#', icon: RotateCcw },
-                { name: t('Alumni'), href: '#', icon: Award },
+                { name: t('Absensi Siswa'), href: '/student-attendances', icon: UserCheck },
+                { name: t('Orang Tua'), href: '/guardians', icon: Users },
+                { name: t('Mutasi'), href: '/mutations', icon: RotateCcw },
+                { name: t('Alumni'), href: '/alumnis', icon: Award },
             ]
         },
         {
             title: 'GURU & PEGAWAI',
             items: [
                 { name: t('Data Guru'), href: '/teachers', icon: BriefcaseBusiness },
-                { name: t('Data Pegawai'), href: '#', icon: UserCheck },
-                { name: t('Absensi Guru'), href: '#', icon: ClipboardList },
+                { name: t('Data Pegawai'), href: '/employees', icon: UserCheck },
+                { name: t('Absensi Guru'), href: '/teacher-attendances', icon: ClipboardList },
             ]
         },
         {
             title: 'AKADEMIK',
             items: [
-                { name: t('Jadwal Pelajaran'), href: '/schedules', icon: CalendarClock },
+                { name: t('Jadwal Pelajaran'), href: '/lms/schedules', icon: CalendarClock },
                 { name: t('LMS / E-Learning'), href: '/study-materials', icon: MonitorPlay },
                 { name: t('Ujian (CBT)'), href: '/exams', icon: FileQuestion },
                 { name: t('Input Nilai'), href: '/grades', icon: Edit },

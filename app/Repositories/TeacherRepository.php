@@ -4,17 +4,49 @@ namespace App\Repositories;
 
 use App\Models\Teacher;
 use App\Repositories\Contracts\TeacherRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-class TeacherRepository extends BaseRepository implements TeacherRepositoryInterface
+class TeacherRepository implements TeacherRepositoryInterface
 {
-    public function __construct(Teacher $model)
+    public function getPaginatedBySchool(string $schoolId, int $perPage = 10, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
-        parent::__construct($model);
+        $query = Teacher::where('school_id', $schoolId);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+
+        // Urutkan berdasarkan nama
+        return $query->orderBy('name')->paginate($perPage);
     }
 
-    public function getPaginatedTeachers(int $perPage = 10)
+    public function findByIdAndSchool(string $id, string $schoolId): ?Teacher
     {
-        // Trait BelongsToTenant sudah memfilter data per sekolah secara otomatis
-        return $this->model->latest()->paginate($perPage);
+        return Teacher::where('school_id', $schoolId)->where('id', $id)->firstOrFail();
+    }
+
+    public function create(array $data): Teacher
+    {
+        return Teacher::create($data);
+    }
+
+    public function update(string $id, string $schoolId, array $data): bool
+    {
+        $teacher = $this->findByIdAndSchool($id, $schoolId);
+        return $teacher->update($data);
+    }
+
+    public function delete(string $id, string $schoolId): bool
+    {
+        $teacher = $this->findByIdAndSchool($id, $schoolId);
+        return $teacher->delete();
     }
 }

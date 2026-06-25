@@ -2,7 +2,15 @@
 
 namespace App\Repositories\Contracts;
 
-interface AcademicYearRepositoryInterface extends BaseRepositoryInterface
+use App\Models\AcademicYear;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+interface AcademicYearRepositoryInterface
 {
-    public function deactivateAllForSchool(string $schoolId): void;
+    public function getPaginatedBySchool(string $schoolId, int $perPage = 10, ?string $search = null): LengthAwarePaginator;
+    public function findByIdAndSchool(string $id, string $schoolId): ?AcademicYear;
+    public function create(array $data): AcademicYear;
+    public function update(string $id, string $schoolId, array $data): bool;
+    public function delete(string $id, string $schoolId): bool;
+    public function deactivateAllOther(string $schoolId, string $exceptId = null): void;
 }

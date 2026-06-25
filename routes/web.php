@@ -1,23 +1,33 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\MasterData\AcademicYearController;
-use App\Http\Controllers\MasterData\SubjectController;
-use App\Http\Controllers\MasterData\ClassroomController;
+use App\Http\Controllers\TenantAdmin\AcademicYearController;
+use App\Http\Controllers\TenantAdmin\SubjectController;
+use App\Http\Controllers\TenantAdmin\ClassroomController;
 use App\Http\Controllers\Public\PPDBController;
 use App\Http\Controllers\Admin\PPDBAdminController;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\Academic\ScheduleController;
+use App\Http\Controllers\TenantAdmin\StudentController;
+use App\Http\Controllers\TenantAdmin\GuardianController;
+use App\Http\Controllers\TenantAdmin\MutationController;
+use App\Http\Controllers\TenantAdmin\AlumniController;
+use App\Http\Controllers\TenantAdmin\TeacherController;
+use App\Http\Controllers\TenantAdmin\EmployeeController;
+use App\Http\Controllers\TenantAdmin\StudentAttendanceController;
+use App\Http\Controllers\TenantAdmin\TeacherAttendanceController;
+use App\Http\Controllers\TenantAdmin\ScheduleController;
 use App\Http\Controllers\Academic\AttendanceController;
-use App\Http\Controllers\Academic\GradeController;
-use App\Http\Controllers\Academic\ReportCardController;
+use App\Http\Controllers\TenantAdmin\GradeController;
+use App\Http\Controllers\TenantAdmin\ReportCardController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentController;
-use App\Http\Controllers\Lms\StudyMaterialController;
-use App\Http\Controllers\Lms\ExamController;
+use App\Http\Controllers\TenantAdmin\StudyMaterialController;
+use App\Http\Controllers\TenantAdmin\ExamController;
+use App\Http\Controllers\TenantAdmin\ExamQuestionController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\LanguageSwitchController;
+use App\Http\Controllers\TenantAdmin\MajorController;
+use App\Http\Controllers\TenantAdmin\SchoolProfileController;
+use App\Http\Controllers\TenantStudent\CbtController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -135,9 +145,12 @@ Route::middleware('auth')->group(function () {
 
     // Group Master Data
     Route::prefix('master-data')->name('master-data.')->group(function () {
+        Route::get('school-profile', [SchoolProfileController::class, 'index'])->name('school-profile.index');
+        Route::post('school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
         Route::resource('academic-years', AcademicYearController::class)->except(['create', 'show', 'edit']);
         Route::resource('subjects', SubjectController::class)->except(['create', 'show', 'edit']);
         Route::resource('classrooms', ClassroomController::class)->except(['create', 'show', 'edit']);
+        Route::resource('majors', MajorController::class)->except(['create', 'show', 'edit']);
     });
 
     // Group Admin PPDB
@@ -146,18 +159,37 @@ Route::middleware('auth')->group(function () {
         Route::put('/{admission}/status', [PPDBAdminController::class, 'updateStatus'])->name('update-status');
     });
 
-    // Modul Siswa & Guru
+    // Modul Siswa
     Route::resource('students', StudentController::class)->except(['create', 'show', 'edit']);
+    Route::resource('guardians', GuardianController::class)->except(['create', 'show', 'edit']);
+    Route::resource('mutations', MutationController::class)->except(['create', 'show', 'edit']);
+    Route::resource('alumnis', AlumniController::class)->except(['create', 'show', 'edit']);
+     Route::get('student-attendances', [StudentAttendanceController::class, 'index'])->name('student-attendances.index');
+    Route::post('student-attendances', [StudentAttendanceController::class, 'store'])->name('student-attendances.store');
+
+
+    // Modul Guru & Pegawai
     Route::resource('teachers', TeacherController::class)->except(['create', 'show', 'edit']);
+    Route::resource('employees', EmployeeController::class)->except(['create', 'show', 'edit']);
+    Route::get('teacher-attendances', [TeacherAttendanceController::class, 'index'])->name('teacher-attendances.index');
+    Route::post('teacher-attendances', [TeacherAttendanceController::class, 'store'])->name('teacher-attendances.store');
+    // ...
+
 
     // Modul Akademik & Rapor
     Route::resource('schedules', ScheduleController::class)->except(['create', 'show', 'edit']);
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-    Route::post('/attendances', [AttendanceController::class, 'store'])->name('attendances.store');
-    Route::get('/grades', [GradeController::class, 'index'])->name('grades.index');
-    Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
-    Route::get('/report-cards', [ReportCardController::class, 'index'])->name('report-cards.index');
-    Route::get('/report-cards/{student}/print', [ReportCardController::class, 'printPdf'])->name('report-cards.print');
+    Route::resource('study-materials', StudyMaterialController::class)->except(['create', 'show', 'edit']);
+    Route::resource('exams', ExamController::class)->except(['create', 'show', 'edit']);
+    Route::get('exams/{exam}/questions', [ExamQuestionController::class, 'index'])->name('exams.questions.index');
+    Route::post('exams/{exam}/questions', [ExamQuestionController::class, 'store'])->name('exams.questions.store');
+    Route::put('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'update'])->name('exams.questions.update');
+    Route::delete('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy'])->name('exams.questions.destroy');
+
+    Route::get('grades', [GradeController::class, 'index'])->name('grades.index');
+    Route::post('grades', [GradeController::class, 'store'])->name('grades.store');
+    Route::get('report-cards', [ReportCardController::class, 'index'])->name('report-cards.index');
+    Route::get('report-cards/{student}', [ReportCardController::class, 'show'])->name('report-cards.show');
+
 
     // Modul Keuangan
     Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
@@ -168,4 +200,12 @@ Route::middleware('auth')->group(function () {
     // Modul LMS (E-Learning)
     Route::resource('study-materials', StudyMaterialController::class)->except(['create', 'show', 'edit']); 
     Route::resource('exams', ExamController::class)->except(['create', 'show', 'edit']);
+
+        // Modul CBT Siswa (PENTING: Dibungkus auth agar redirect ke login jika belum masuk)
+    Route::middleware(['auth'])->prefix('student/cbt')->name('student.cbt.')->group(function () {
+        Route::get('/', [CbtController::class, 'index'])->name('index');
+        Route::get('/{exam}/play', [CbtController::class, 'play'])->name('play');
+        Route::post('/{exam}/answer', [CbtController::class, 'answer'])->name('answer');
+        Route::post('/{exam}/finish', [CbtController::class, 'finish'])->name('finish');
+    });
 });

@@ -2,8 +2,13 @@
 
 namespace App\Repositories\Contracts;
 
-interface GradeRepositoryInterface extends BaseRepositoryInterface
+use Illuminate\Support\Collection;
+
+interface GradeRepositoryInterface
 {
-    public function updateOrCreateBulk(array $gradesData, string $subjectId, string $type, string $academicYearId);
-    public function getByStudentsSubjectAndType(array $studentIds, string $subjectId, string $type, string $academicYearId);
+    // Mengambil daftar form input nilai masal berdasarkan filter kelas, mapel, dsb
+    public function getBulkGradeForm(string $schoolId, string $academicYearId, string $classroomId, string $subjectId, string $type): Collection;
+    
+    // Menyimpan absensi masal (Insert or Update)
+    public function upsertBulkGrades(string $schoolId, array $data): bool;
 }

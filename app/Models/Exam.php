@@ -2,34 +2,42 @@
 
 namespace App\Models;
 
-use App\Traits\UsesUuid;
-use App\Traits\BelongsToTenant;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Exam extends Model
 {
-    use HasFactory, UsesUuid, BelongsToTenant;
+    use HasUuids;
 
     protected $fillable = [
         'school_id',
+        'teacher_id',
         'subject_id',
         'classroom_id',
         'title',
+        'description',
         'start_time',
         'end_time',
-        'duration_minutes',
-        'description',
+        'duration',
+        'is_active',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+        'is_active' => 'boolean',
+        'duration' => 'integer',
+    ];
+
+    public function school(): BelongsTo
     {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-            'duration_minutes' => 'integer',
-        ];
+        return $this->belongsTo(School::class);
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
     }
 
     public function subject(): BelongsTo

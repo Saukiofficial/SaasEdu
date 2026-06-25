@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\UsesUuid;
-use App\Traits\BelongsToTenant;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Teacher extends Model
 {
-    use HasFactory, UsesUuid, BelongsToTenant;
+    use HasUuids;
 
     protected $fillable = [
         'school_id',
@@ -25,11 +23,13 @@ class Teacher extends Model
         'status',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'birth_date' => 'date',
+    ];
+
+    public function school(): BelongsTo
     {
-        return [
-            'birth_date' => 'date',
-        ];
+        return $this->belongsTo(School::class);
     }
 
     public function user(): BelongsTo

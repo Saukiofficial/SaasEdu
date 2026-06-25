@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\UsesUuid;
-use App\Traits\BelongsToTenant;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Subject extends Model
 {
-    use HasFactory, UsesUuid, BelongsToTenant;
+    use HasUuids;
 
     protected $fillable = [
         'school_id',
@@ -19,10 +18,12 @@ class Subject extends Model
         'is_active',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    public function school(): BelongsTo
     {
-        return [
-            'is_active' => 'boolean',
-        ];
+        return $this->belongsTo(School::class);
     }
 }

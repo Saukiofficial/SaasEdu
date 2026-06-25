@@ -4,32 +4,31 @@ namespace App\Services;
 
 use App\Repositories\Contracts\ExamRepositoryInterface;
 
-class ExamService extends BaseService
+class ExamService
 {
-    protected ExamRepositoryInterface $examRepository;
+    public function __construct(
+        protected ExamRepositoryInterface $examRepository
+    ) {}
 
-    public function __construct(ExamRepositoryInterface $examRepository)
+    public function getExamsPaginated(string $schoolId, array $filters = [])
     {
-        $this->examRepository = $examRepository;
+        $perPage = $filters['per_page'] ?? 10;
+        return $this->examRepository->getPaginatedBySchool($schoolId, $perPage, $filters);
     }
 
-    public function getExams(array $filters = [])
+    public function createExam(string $schoolId, array $data)
     {
-        return $this->examRepository->getPaginatedWithRelations(10, $filters);
-    }
-
-    public function createExam(array $data)
-    {
+        $data['school_id'] = $schoolId;
         return $this->examRepository->create($data);
     }
 
-    public function updateExam(string $id, array $data)
+    public function updateExam(string $id, string $schoolId, array $data)
     {
-        return $this->examRepository->update($id, $data);
+        return $this->examRepository->update($id, $schoolId, $data);
     }
 
-    public function deleteExam(string $id)
+    public function deleteExam(string $id, string $schoolId)
     {
-        return $this->examRepository->delete($id);
+        return $this->examRepository->delete($id, $schoolId);
     }
 }

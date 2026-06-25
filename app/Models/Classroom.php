@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\UsesUuid;
-use App\Traits\BelongsToTenant;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Classroom extends Model
 {
-    use HasFactory, UsesUuid, BelongsToTenant;
+    use HasUuids;
 
     protected $fillable = [
         'school_id',
@@ -18,10 +17,12 @@ class Classroom extends Model
         'capacity',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'capacity' => 'integer',
+    ];
+
+    public function school(): BelongsTo
     {
-        return [
-            'capacity' => 'integer',
-        ];
+        return $this->belongsTo(School::class);
     }
 }

@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\UsesUuid;
-use App\Traits\BelongsToTenant;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Schedule extends Model
 {
-    use HasFactory, UsesUuid, BelongsToTenant;
+    use HasUuids;
 
     protected $fillable = [
         'school_id',
@@ -22,6 +20,11 @@ class Schedule extends Model
         'start_time',
         'end_time',
     ];
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function academicYear(): BelongsTo
     {

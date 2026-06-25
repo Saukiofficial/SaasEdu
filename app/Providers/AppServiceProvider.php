@@ -85,6 +85,24 @@ use App\Repositories\Contracts\LanguageRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\Contracts\LandingProductRepositoryInterface;
 use App\Repositories\LandingProductRepository;
+use App\Repositories\Contracts\MajorRepositoryInterface;
+use App\Repositories\MajorRepository;
+use App\Repositories\Contracts\SchoolProfileRepositoryInterface;
+use App\Repositories\SchoolProfileRepository;
+use App\Repositories\Contracts\GuardianRepositoryInterface;
+use App\Repositories\GuardianRepository;
+use App\Repositories\Contracts\StudentMutationRepositoryInterface;
+use App\Repositories\StudentMutationRepository;
+use App\Repositories\Contracts\AlumniRepositoryInterface;
+use App\Repositories\AlumniRepository;
+use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Repositories\EmployeeRepository;
+use App\Repositories\Contracts\StudentAttendanceRepositoryInterface;
+use App\Repositories\StudentAttendanceRepository;
+use App\Repositories\Contracts\TeacherAttendanceRepositoryInterface;
+use App\Repositories\TeacherAttendanceRepository;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -129,6 +147,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BrandingRepositoryInterface::class, BrandingRepository::class);
         $this->app->bind(LanguageRepositoryInterface::class, LanguageRepository::class);
         $this->app->bind(LandingProductRepositoryInterface::class, LandingProductRepository::class);
+        $this->app->bind(\App\Repositories\Contracts\MajorRepositoryInterface::class, \App\Repositories\MajorRepository::class);
+        $this->app->bind(MajorRepositoryInterface::class, MajorRepository::class);
+        $this->app->bind(SchoolProfileRepositoryInterface::class, SchoolProfileRepository::class);
+        $this->app->bind(GuardianRepositoryInterface::class, GuardianRepository::class);
+        $this->app->bind(StudentMutationRepositoryInterface::class, StudentMutationRepository::class);
+        $this->app->bind(AlumniRepositoryInterface::class, AlumniRepository::class);
+        $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
+        $this->app->bind(StudentAttendanceRepositoryInterface::class, StudentAttendanceRepository::class);
+        $this->app->bind(TeacherAttendanceRepositoryInterface::class, TeacherAttendanceRepository::class);
     }
 
     public function boot(): void

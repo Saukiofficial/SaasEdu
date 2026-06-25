@@ -4,39 +4,38 @@ namespace App\Services;
 
 use App\Repositories\Contracts\StudyMaterialRepositoryInterface;
 
-class StudyMaterialService extends BaseService
+class StudyMaterialService
 {
-    protected StudyMaterialRepositoryInterface $studyMaterialRepository;
+    public function __construct(
+        protected StudyMaterialRepositoryInterface $materialRepository
+    ) {}
 
-    public function __construct(StudyMaterialRepositoryInterface $studyMaterialRepository)
+    public function getMaterialsPaginated(string $schoolId, array $filters = [])
     {
-        $this->studyMaterialRepository = $studyMaterialRepository;
+        $perPage = $filters['per_page'] ?? 10;
+        return $this->materialRepository->getPaginatedBySchool($schoolId, $perPage, $filters);
     }
 
-    public function getStudyMaterials(array $filters = [])
+    public function createMaterial(string $schoolId, array $data)
     {
-        return $this->studyMaterialRepository->getPaginatedWithRelations(10, $filters);
-    }
-
-    public function createStudyMaterial(array $data)
-    {
-        // Jika type bukan assignment, pastikan due_date null
+        $data['school_id'] = $schoolId;
+        // Kosongkan due_date jika tipenya materi
         if ($data['type'] === 'material') {
             $data['due_date'] = null;
         }
-        return $this->studyMaterialRepository->create($data);
+        return $this->materialRepository->create($data);
     }
 
-    public function updateStudyMaterial(string $id, array $data)
+    public function updateMaterial(string $id, string $schoolId, array $data)
     {
         if ($data['type'] === 'material') {
             $data['due_date'] = null;
         }
-        return $this->studyMaterialRepository->update($id, $data);
+        return $this->materialRepository->update($id, $schoolId, $data);
     }
 
-    public function deleteStudyMaterial(string $id)
+    public function deleteMaterial(string $id, string $schoolId)
     {
-        return $this->studyMaterialRepository->delete($id);
+        return $this->materialRepository->delete($id, $schoolId);
     }
 }

@@ -4,32 +4,33 @@ namespace App\Services;
 
 use App\Repositories\Contracts\ClassroomRepositoryInterface;
 
-class ClassroomService extends BaseService
+class ClassroomService
 {
-    protected ClassroomRepositoryInterface $classroomRepository;
+    public function __construct(
+        protected ClassroomRepositoryInterface $classroomRepository
+    ) {}
 
-    public function __construct(ClassroomRepositoryInterface $classroomRepository)
+    public function getClassroomsPaginated(string $schoolId, array $filters = [])
     {
-        $this->classroomRepository = $classroomRepository;
+        $search = $filters['search'] ?? null;
+        $perPage = $filters['per_page'] ?? 10;
+
+        return $this->classroomRepository->getPaginatedBySchool($schoolId, $perPage, $search);
     }
 
-    public function getAll()
+    public function createClassroom(string $schoolId, array $data)
     {
-        return $this->classroomRepository->all();
-    }
-
-    public function createClassroom(array $data)
-    {
+        $data['school_id'] = $schoolId;
         return $this->classroomRepository->create($data);
     }
 
-    public function updateClassroom(string $id, array $data)
+    public function updateClassroom(string $id, string $schoolId, array $data)
     {
-        return $this->classroomRepository->update($id, $data);
+        return $this->classroomRepository->update($id, $schoolId, $data);
     }
 
-    public function deleteClassroom(string $id)
+    public function deleteClassroom(string $id, string $schoolId)
     {
-        return $this->classroomRepository->delete($id);
+        return $this->classroomRepository->delete($id, $schoolId);
     }
 }

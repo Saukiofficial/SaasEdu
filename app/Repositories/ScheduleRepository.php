@@ -4,20 +4,48 @@ namespace App\Repositories;
 
 use App\Models\Schedule;
 use App\Repositories\Contracts\ScheduleRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-class ScheduleRepository extends BaseRepository implements ScheduleRepositoryInterface
+class ScheduleRepository implements ScheduleRepositoryInterface
 {
-    public function __construct(Schedule $model)
+    public function getPaginatedBySchool(string $schoolId, int $perPage = 10, array $filters = []): LengthAwarePaginator
     {
-        parent::__construct($model);
+        // Eager load semua relasi agar tidak N+1 query problem
+        $query = Schedule::with(['academicYear', 'classroom', 'subject', 'teacher'])
+                         ->where('school_id', $schoolId);
+
+        if (!empty($filters['classroom_id'])) {
+            $query->where('classroom_id', $filters['classroom_id']);
+        }
+
+        if (!empty($filters['day'])) {
+            $query->where('day', $filters['day']);
+        }
+
+        // Urutkan berdasarkan hari (secara string/enum) lalu jam mulai
+        // Note: Pengurutan hari secara alfabetis mungkin kurang pas, tapi cukup untuk versi standar.
+        return $query->orderBy('day')->orderBy('start_time')->paginate($perPage);
     }
 
-    public function getPaginatedWithRelations(int $perPage = 10)
+    public function findByIdAndSchool(string $id, string $schoolId): ?Schedule
     {
-        // Memuat relasi agar tidak terjadi N+1 query problem
-        return $this->model->with(['academicYear', 'classroom', 'subject', 'teacher'])
-                           ->orderBy('day')
-                           ->orderBy('start_time')
-                           ->paginate($perPage);
+        return Schedule::where('school_id', $schoolId)->where('id', $id)->firstOrFail();
+    }
+
+    public function create(array $data): Schedule
+    {
+        return Schedule::create($data);
+    }
+
+    public function update(string $id, string $schoolId, array $data): bool
+    {
+        $schedule = $this->findByIdAndSchool($id, $schoolId);
+        return $schedule->update($data);
+    }
+
+    public function delete(string $id, string $schoolId): bool
+    {
+        $schedule = $this->findByIdAndSchool($id, $schoolId);
+        return $schedule->delete();
     }
 }
