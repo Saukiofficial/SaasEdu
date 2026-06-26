@@ -28,6 +28,8 @@ use App\Http\Controllers\LanguageSwitchController;
 use App\Http\Controllers\TenantAdmin\MajorController;
 use App\Http\Controllers\TenantAdmin\SchoolProfileController;
 use App\Http\Controllers\TenantStudent\CbtController;
+use App\Http\Controllers\Frontend\SourceCodeCheckoutController;
+use App\Http\Controllers\Customer\CustomerDashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -38,6 +40,14 @@ Route::get('/product/{slug}', [FrontendController::class, 'productDetail'])->nam
 Route::get('/ppdb/{school}', [PPDBController::class, 'showLanding'])->name('ppdb.landing');
 Route::post('/ppdb/{school}', [PPDBController::class, 'store'])->name('ppdb.store');
 Route::post('/language/switch', [LanguageSwitchController::class, 'switch'])->name('language.switch');
+
+Route::get('/product/{slug}/checkout', [SourceCodeCheckoutController::class, 'show'])->name('source-code.checkout');
+Route::post('/product/{slug}/checkout', [SourceCodeCheckoutController::class, 'process']);
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/customer/dashboard', [CustomerDashboardController::class, 'index'])->name('customer.dashboard');
+    Route::get('/customer/orders/{order}/download', [CustomerDashboardController::class, 'download'])->name('customer.download');
+});
 
 // --- GUEST ROUTES ---
 Route::middleware('guest')->group(function () {
@@ -128,6 +138,15 @@ Route::middleware('auth')->group(function () {
         Route::put('landing-products/{landingProduct}', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'update'])->name('landing-products.update');
         Route::delete('landing-products/{landingProduct}', [\App\Http\Controllers\SuperAdmin\LandingProductController::class, 'destroy'])->name('landing-products.destroy');
 
+        //-- E-COMMERCE / DIGITAL PRODUCTS ---
+        Route::get('source-codes', [\App\Http\Controllers\SuperAdmin\SourceCodeController::class, 'index'])->name('source-codes.index');
+        Route::post('source-codes', [\App\Http\Controllers\SuperAdmin\SourceCodeController::class, 'store'])->name('source-codes.store');
+        Route::post('source-codes/{sourceCode}', [\App\Http\Controllers\SuperAdmin\SourceCodeController::class, 'update'])->name('source-codes.update'); // POST for File Upload spoofing
+        Route::delete('source-codes/{sourceCode}', [\App\Http\Controllers\SuperAdmin\SourceCodeController::class, 'destroy'])->name('source-codes.destroy');
+
+        Route::get('source-code-orders', [\App\Http\Controllers\SuperAdmin\SourceCodeOrderController::class, 'index'])->name('source-code-orders.index');
+        Route::put('source-code-orders/{order}/status', [\App\Http\Controllers\SuperAdmin\SourceCodeOrderController::class, 'updateStatus'])->name('source-code-orders.update-status');
+        Route::delete('source-code-orders/{order}', [\App\Http\Controllers\SuperAdmin\SourceCodeOrderController::class, 'destroy'])->name('source-code-orders.destroy');
 
 
         // --- SECURITY CENTER Module ---

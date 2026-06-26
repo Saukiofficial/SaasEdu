@@ -101,6 +101,10 @@ use App\Repositories\Contracts\StudentAttendanceRepositoryInterface;
 use App\Repositories\StudentAttendanceRepository;
 use App\Repositories\Contracts\TeacherAttendanceRepositoryInterface;
 use App\Repositories\TeacherAttendanceRepository;
+use App\Repositories\Contracts\SourceCodeRepositoryInterface;
+use App\Repositories\SourceCodeRepository;
+use App\Repositories\Contracts\SourceCodeOrderRepositoryInterface;
+use App\Repositories\SourceCodeOrderRepository;
 
 
 
@@ -156,6 +160,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EmployeeRepositoryInterface::class, EmployeeRepository::class);
         $this->app->bind(StudentAttendanceRepositoryInterface::class, StudentAttendanceRepository::class);
         $this->app->bind(TeacherAttendanceRepositoryInterface::class, TeacherAttendanceRepository::class);
+        $this->app->bind(SourceCodeRepositoryInterface::class, SourceCodeRepository::class);
+        $this->app->bind(SourceCodeOrderRepositoryInterface::class, SourceCodeOrderRepository::class);
     }
 
     public function boot(): void

@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Schema;
 
 class HandleInertiaRequests extends Middleware
 {
-# ... existing code ...
+    protected $rootView = 'app';
+
     public function version(Request $request): ?string
     {
         return parent::version($request);
@@ -25,20 +26,21 @@ class HandleInertiaRequests extends Middleware
                     ->get(['code', 'name']);
             }
         } catch (\Exception $e) {
-            // Abaikan jika tabel belum ada (saat awal instalasi)
+            // Abaikan jika tabel belum ada
         }
 
         return [
             ...parent::share($request),
+            
+            // PERBARUI BAGIAN INI: Load relasi 'roles' dan 'school'
             'auth' => [
-                // Tambahkan load latestSubscription di sini
-                'user' => $request->user() ? $request->user()->load(['school.latestSubscription', 'roles']) : null,
+                'user' => $request->user() ? $request->user()->load(['school', 'roles']) : null,
             ],
+            
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            // Data untuk fitur pergantian bahasa
             'locale' => session('locale', app()->getLocale()),
             'available_languages' => $activeLanguages,
         ];

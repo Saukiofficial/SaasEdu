@@ -10,12 +10,10 @@ import {
     School, UsersRound, GraduationCap, BriefcaseBusiness, CalendarDays, 
     CalendarClock, ClipboardList, FileQuestion, Award, Printer, Banknote, 
     LogOut, Menu, X, Bell, Search, MessageSquare, ChevronDown, Calendar, 
-    ShieldCheck, Mail, CheckCircle2, Edit
+    ShieldCheck, Mail, CheckCircle2, Edit, ShoppingCart, Download
 } from 'lucide-react';
 
 // --- KAMUS TERJEMAHAN (DICTIONARY) ---
-// Dalam skala produksi, data ini biasanya dikirim dari file lang/en.json Laravel.
-// Untuk saat ini kita simpan di sini agar langsung berfungsi pada Layout.
 const translations: Record<string, Record<string, string>> = {
     en: {
         'Membuka Ruang Akademik…': 'Opening Academic Workspace...',
@@ -31,6 +29,7 @@ const translations: Record<string, Record<string, string>> = {
         'Platform Manajemen Akademik Terpadu': 'Integrated Academic Management Platform',
         'Super Administrator': 'Super Administrator',
         'Tenant Admin': 'Tenant Admin',
+        'Customer': 'Customer',
         
         // Terjemahan Menu Super Admin
         'Dashboard Utama': 'Main Dashboard',
@@ -71,6 +70,10 @@ const translations: Record<string, Record<string, string>> = {
         'Surat Menyurat': 'Mailing',
         'Laporan Umum': 'General Reports',
         'Pengaturan': 'Settings',
+
+        // Terjemahan Customer Portal
+        'Dashboard Pembelian': 'Purchases Dashboard',
+        'Profil Saya': 'My Profile'
     }
 };
 
@@ -91,16 +94,14 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         });
     };
 
-    // Fungsi helper untuk menerjemahkan teks (DIPERBAIKI)
     const t = (key: string) => {
-        // Otomatis ubah kode ke huruf kecil dan ambil 2 huruf awal saja (en / eng / EN / ENG -> en)
         const localeStr = String(currentLocale).toLowerCase();
         const langKey = localeStr.startsWith('en') ? 'en' : 'id'; 
 
         if (langKey !== 'id' && translations[langKey] && translations[langKey][key]) {
             return translations[langKey][key];
         }
-        return key; // Fallback ke teks asli (Bahasa Indonesia)
+        return key; 
     };
     // ------------------------------------------------
 
@@ -117,10 +118,6 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
 
     const currentUrl = url || '';
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const isSuperAdmin = user.school_id === null;
-
-    // --- STATE UNTUK COLLAPSE / EXPAND GRUP MENU SIDEBAR ---
-    // Menyimpan judul grup yang sedang di-collapse (disembunyikan itemnya)
     const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
     const toggleGroup = (title: string) => {
@@ -129,6 +126,11 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
             [title]: !prev[title],
         }));
     };
+
+    // --- IDENTIFIKASI ROLE PENGGUNA ---
+    const roles = user.roles?.map((r: any) => r.name) || [];
+    const isCustomer = roles.includes('Customer');
+    const isSuperAdmin = user.school_id === null && !isCustomer;
 
     // --- MENU SUPER ADMIN ---
     const superAdminGroups = [
@@ -185,6 +187,13 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
             ]
         },
         {
+            title: 'E-COMMERCE / DIGITAL',
+            items: [
+                { name: 'Source Codes', href: '/super-admin/source-codes', icon: Code },
+                { name: 'Sales / Transaksi', href: '/super-admin/source-code-orders', icon: ShoppingCart },
+            ]
+        },
+        {
             title: 'ANALYTICS',
             items: [
                 { name: 'Revenue & Growth', href: '/super-admin/reports', icon: PieChart },
@@ -216,7 +225,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         }
     ];
 
-    // --- MENU KLIEN / SEKOLAH (UPDATED) ---
+    // --- MENU KLIEN / SEKOLAH ---
     const schoolGroups = [
         {
             title: 'DASHBOARD',
@@ -306,7 +315,25 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
         }
     ];
 
-    const menuGroups = isSuperAdmin ? superAdminGroups : schoolGroups;
+    // --- MENU CUSTOMER PORTAL (SOURCE CODE) ---
+    const customerGroups = [
+        {
+            title: 'CUSTOMER PORTAL',
+            items: [
+                { name: t('Dashboard Pembelian'), href: '/customer/dashboard', icon: LayoutDashboard },
+                { name: 'Katalog Produk', href: '/#product', icon: Package },
+            ]
+        },
+        {
+            title: 'PENGATURAN',
+            items: [
+                { name: t('Profil Saya'), href: '/profile', icon: Settings },
+            ]
+        }
+    ];
+
+    // Tentukan menu grup berdasarkan role
+    const menuGroups = isSuperAdmin ? superAdminGroups : (isCustomer ? customerGroups : schoolGroups);
 
     return (
         <div className="flex h-screen bg-[#F4F1E8] font-sans text-[#1C2333] overflow-hidden">
@@ -327,7 +354,7 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                                 Akademia<span className="text-[#D4AF7A]">OS</span>
                             </span>
                             <span className="text-[9px] text-[#8B93A8] uppercase tracking-[0.2em] block mt-0.5">
-                                {t('Sistem Informasi Akademik')}
+                                {isCustomer ? 'Customer Portal' : t('Sistem Informasi Akademik')}
                             </span>
                         </div>
                     </div>
@@ -372,8 +399,8 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                     })}
                 </div>
 
-                {/* ACCREDITATION / STATUS WIDGET (Ditampilkan khusus klien) */}
-                {!isSuperAdmin && (
+                {/* ACCREDITATION / STATUS WIDGET (Ditampilkan khusus tenant/sekolah) */}
+                {(!isSuperAdmin && !isCustomer) && (
                     <div className="px-4 pb-4 shrink-0">
                         <div className="border border-[#B8935F]/30 rounded-lg p-4 text-center relative bg-[#141C30]">
                             <div className="w-9 h-9 border border-[#B8935F]/50 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -396,7 +423,9 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                         </div>
                         <div className="overflow-hidden min-w-0">
                             <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-                            <p className="text-[10px] text-[#8B93A8] truncate">{isSuperAdmin ? t('Super Administrator') : (user.school ? user.school.name : t('Tenant Admin'))}</p>
+                            <p className="text-[10px] text-[#8B93A8] truncate">
+                                {isSuperAdmin ? t('Super Administrator') : (isCustomer ? t('Customer') : (user.school ? user.school.name : t('Tenant Admin')))}
+                            </p>
                         </div>
                     </div>
                     <LogOut className="w-4 h-4 text-[#6B7593] shrink-0 ml-2 hover:text-red-400" />
@@ -493,18 +522,20 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                     </div>
 
                     <div className="flex items-center gap-4 sm:gap-6">
-                        {/* Tahun Ajaran Selector */}
-                        <div className="hidden lg:flex items-center gap-3 border-r border-[#E2DDD0] pr-6">
-                            <div className="w-8 h-8 rounded-full bg-[#FAF8F3] border border-[#E2DDD0] flex items-center justify-center">
-                                <Calendar className="w-4 h-4 text-[#16213E]" />
+                        {/* Tahun Ajaran Selector (Hanya Tenant/Sekolah) */}
+                        {(!isSuperAdmin && !isCustomer) && (
+                            <div className="hidden lg:flex items-center gap-3 border-r border-[#E2DDD0] pr-6">
+                                <div className="w-8 h-8 rounded-full bg-[#FAF8F3] border border-[#E2DDD0] flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 text-[#16213E]" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] text-[#A8A296] font-semibold uppercase tracking-wider">{t('Tahun Ajaran')}</span>
+                                    <span className="text-sm font-semibold text-[#1C2333] flex items-center gap-1 cursor-pointer hover:text-[#16213E]">
+                                        2024/2025 Genap <ChevronDown className="w-3 h-3 text-[#A8A296]" />
+                                    </span>
+                                </div>
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-[9px] text-[#A8A296] font-semibold uppercase tracking-wider">{t('Tahun Ajaran')}</span>
-                                <span className="text-sm font-semibold text-[#1C2333] flex items-center gap-1 cursor-pointer hover:text-[#16213E]">
-                                    2024/2025 Genap <ChevronDown className="w-3 h-3 text-[#A8A296]" />
-                                </span>
-                            </div>
-                        </div>
+                        )}
 
                         {/* Notifications */}
                         <div className="flex items-center gap-3 border-r border-[#E2DDD0] pr-6">
@@ -573,7 +604,9 @@ export default function AuthenticatedLayout({ children, header }: { children: Re
                             </div>
                             <div className="hidden sm:flex flex-col">
                                 <span className="text-sm font-semibold text-[#1C2333]">{user.name}</span>
-                                <span className="text-[10px] text-[#8B93A8]">{isSuperAdmin ? t('Super Administrator') : t('Tenant Admin')}</span>
+                                <span className="text-[10px] text-[#8B93A8]">
+                                    {isSuperAdmin ? t('Super Administrator') : (isCustomer ? t('Customer') : t('Tenant Admin'))}
+                                </span>
                             </div>
                             <ChevronDown className="w-4 h-4 text-[#A8A296] hidden sm:block" />
                         </div>

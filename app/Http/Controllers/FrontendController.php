@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Services\SettingService;
 use App\Models\SubscriptionPackage;
 use App\Models\LandingProduct;
+use App\Models\SourceCode;
 
 class FrontendController extends Controller
 {
@@ -42,13 +43,17 @@ class FrontendController extends Controller
                                      ->orderBy('price', 'asc')
                                      ->get();
 
-        // AMBIL DATA PRODUK YANG AKTIF
+        // AMBIL DATA PRODUK SAAS YANG AKTIF
         $products = LandingProduct::where('is_active', true)->get();
+
+        // AMBIL DATA SOURCE CODE YANG AKTIF
+        $sourceCodes = SourceCode::where('is_active', true)->latest()->take(3)->get();
 
         return Inertia::render('Welcome', [
             'landingData' => $landingData,
             'packages' => $packages,
-            'products' => $products, // Kirim ke Frontend
+            'products' => $products,
+            'sourceCodes' => $sourceCodes, // Kirim ke Frontend
             'app_name' => $settings['app_name'] ?? 'AkademiaOS'
         ]);
     }

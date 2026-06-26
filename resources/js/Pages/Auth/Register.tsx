@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { 
-    Building2, User, Mail, Lock, CreditCard, Tag, 
-    Check, ShieldCheck, ArrowRight, Wallet, HelpCircle,
-    RotateCcw
-} from 'lucide-react';
 
 interface Package {
     id: string;
@@ -56,7 +48,6 @@ export default function Register({ selectedPackage }: Props) {
         if (!data.promo_code) return;
         if (data.promo_code.toUpperCase() === 'DISKON50') {
             setAppliedPromo({ code: 'DISKON50', discount: 50000 });
-            alert('Kode promo berhasil diterapkan!');
         } else {
             alert('Kode promo tidak valid atau sudah kedaluwarsa.');
             setAppliedPromo(null);
@@ -64,347 +55,261 @@ export default function Register({ selectedPackage }: Props) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-100">
-            <Head title={selectedPackage ? "Checkout Berlangganan - AkademiaOS" : "Daftar Free Trial - AkademiaOS"} />
+        <div className="min-h-screen bg-[#EDEAE2] font-body text-[#0B1120] selection:bg-[#2D5F4C] selection:text-white p-0">
+            <Head title={selectedPackage ? "Selesaikan Langganan" : "Daftar Free Trial"} />
+            
+            {/* --- CUSTOM CSS TOKENS (Sama dengan Landing Page) --- */}
+            <style dangerouslySetInnerHTML={{__html: `
+                :root {
+                    --ink: #0B1120; --ink-soft: #141d33; --paper: #F7F5F0; --paper-dim: #EDEAE2;
+                    --moss: #2D5F4C; --moss-light: #3f7d65; --amber: #E8A33D; --amber-deep: #c9842a;
+                    --slate: #475569; --slate-light: #8b96a8; --line: rgba(11,17,32,0.1); --line-light: rgba(247,245,240,0.14);
+                    --font-display: 'Space Grotesk', sans-serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+                }
+                body { font-family: var(--font-body); }
+                .font-display { font-family: var(--font-display); }
+                .font-mono { font-family: var(--font-mono); }
+                
+                .field-input { border: 1.5px solid var(--line); border-radius: 9px; padding: 11px 13px; font-size: 14.5px; background: var(--paper); color: var(--ink); width: 100%; transition: all .2s; }
+                .field-input:focus { border-color: var(--moss); background: #fff; outline: none; }
+                
+                .btn-amber { background: var(--amber); color: var(--ink); font-weight: 600; padding: 15px; border-radius: 9px; width: 100%; transition: all .2s; }
+                .btn-amber:hover:not(:disabled) { background: #f0b454; transform: translateY(-1.5px); box-shadow: 0 10px 24px -8px rgba(232,163,61,0.5); }
+                .btn-amber:disabled { opacity: 0.7; cursor: not-allowed; }
+                
+                .pay-method { border: 1.5px solid var(--line); border-radius: 10px; padding: 13px 10px; display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--slate); cursor: pointer; transition: all .2s; }
+                .pay-method.selected { border-color: var(--moss); background: rgba(45,95,76,0.06); color: var(--moss); }
+            `}} />
 
-            {/* --- TOP NAVBAR --- */}
-            <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-                <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xl">
-                        A
+            {/* --- TOPBAR --- */}
+            <div className="h-[72px] flex items-center justify-between border-b border-[var(--line)] bg-[var(--paper)]">
+                <div className="max-w-[1100px] mx-auto px-7 w-full flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2 text-[14px] font-semibold text-[var(--slate)] hover:text-[var(--ink)] transition-colors">
+                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" className="w-4 h-4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        Kembali
+                    </Link>
+                    <div className="flex items-center gap-2 font-display font-bold text-[16px]">
+                        <div className="w-6 h-6 rounded-md bg-[var(--ink)] flex items-center justify-center shrink-0">
+                            <div className="w-[8px] h-[8px] border-[1.5px] border-[var(--amber)] border-r-transparent border-b-transparent rounded-sm rotate-45"></div>
+                        </div>
+                        AkademiaOS
                     </div>
-                    <span className="font-bold text-xl tracking-tight text-slate-900">AkademiaOS</span>
-                </Link>
-                <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-                    <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                    Secure checkout
+                    <div className="hidden md:flex items-center gap-2 font-mono text-[12.5px] text-[var(--slate-light)]">
+                        <span className="text-[var(--moss)] font-semibold">01 Paket</span> <span>&rarr;</span>
+                        <span className="text-[var(--moss)] font-semibold">02 Checkout</span> <span>&rarr;</span>
+                        <span>03 Selesai</span>
+                    </div>
                 </div>
-            </header>
+            </div>
 
-            {/* --- MAIN CONTENT GRID --- */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-                    
-                    {/* --- KOLOM KIRI: VALUE PROPOSITION & ORDER SUMMARY --- */}
-                    <div className="lg:col-span-5 flex flex-col pt-2">
+            {/* --- CHECKOUT BODY --- */}
+            <div className="max-w-[1100px] mx-auto px-7 pt-14 pb-[100px] grid lg:grid-cols-[1.3fr_1fr] gap-12 items-start">
+                
+                {/* --- BAGIAN KIRI (FORM) --- */}
+                <div>
+                    <div className="mb-9">
+                        <span className="font-mono text-[12.5px] font-semibold text-[var(--amber-deep)] uppercase tracking-[0.06em] mb-2.5 block">Checkout</span>
+                        <h1 className="font-display font-bold text-[30px] tracking-tight mb-2">
+                            {selectedPackage ? 'Selesaikan langganan Anda' : 'Buat akun Free Trial'}
+                        </h1>
+                        <p className="text-[14.5px] text-[var(--slate)]">
+                            {selectedPackage ? 'Isi data di bawah untuk mengaktifkan paket. Anda bisa membatalkan kapan saja.' : 'Nikmati akses penuh selama 14 hari tanpa biaya tersembunyi.'}
+                        </p>
+                    </div>
+
+                    <form onSubmit={submit} className="space-y-5">
                         
-                        <div className="mb-8">
-                            <p className="text-blue-600 font-semibold text-sm mb-3">Langkah 1 dari 1</p>
-                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">
-                                {selectedPackage 
-                                    ? "Selangkah lagi untuk membuka fitur premium" 
-                                    : "Mulai perjalanan digital sekolah Anda"}
-                            </h1>
-                            <p className="text-slate-500 text-base leading-relaxed">
-                                {selectedPackage 
-                                    ? "Selesaikan pendaftaran dan nikmati kemudahan manajemen akademik terpadu."
-                                    : "Coba semua fitur unggulan secara gratis selama 14 hari tanpa komitmen."}
-                            </p>
+                        {errors.error && (
+                            <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-[13.5px] font-semibold">
+                                {errors.error}
+                            </div>
+                        )}
+
+                        {/* BLOCK 1: Data Akun */}
+                        <div className="bg-white border border-[var(--line)] rounded-2xl p-7">
+                            <h3 className="font-display font-semibold text-[16px] flex items-center gap-2 mb-5">
+                                <span className="w-5 h-5 rounded-full bg-[var(--ink)] text-white font-mono text-[11px] flex items-center justify-center">1</span> Data Institusi & Admin
+                            </h3>
+                            
+                            <div className="space-y-3.5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label htmlFor="school_name" className="text-[12.5px] font-semibold text-[var(--slate)]">Nama institusi / usaha</label>
+                                        <input type="text" id="school_name" className="field-input" placeholder="Contoh: Universitas Nusantara" value={data.school_name} onChange={e => setData('school_name', e.target.value)} />
+                                        {errors.school_name && <span className="text-[11px] text-red-500">{errors.school_name}</span>}
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label htmlFor="name" className="text-[12.5px] font-semibold text-[var(--slate)]">Nama pengelola</label>
+                                        <input type="text" id="name" className="field-input" placeholder="Nama Lengkap" value={data.name} onChange={e => setData('name', e.target.value)} />
+                                        {errors.name && <span className="text-[11px] text-red-500">{errors.name}</span>}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <label htmlFor="email" className="text-[12.5px] font-semibold text-[var(--slate)]">Email aktif</label>
+                                    <input type="email" id="email" className="field-input" placeholder="admin@institusi.ac.id" value={data.email} onChange={e => setData('email', e.target.value)} />
+                                    {errors.email && <span className="text-[11px] text-red-500">{errors.email}</span>}
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label htmlFor="password" className="text-[12.5px] font-semibold text-[var(--slate)]">Kata Sandi</label>
+                                        <input type="password" id="password" className="field-input" placeholder="Min. 8 karakter" value={data.password} onChange={e => setData('password', e.target.value)} />
+                                        {errors.password && <span className="text-[11px] text-red-500">{errors.password}</span>}
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label htmlFor="password_confirmation" className="text-[12.5px] font-semibold text-[var(--slate)]">Ulangi Sandi</label>
+                                        <input type="password" id="password_confirmation" className="field-input" placeholder="Ketik ulang sandi" value={data.password_confirmation} onChange={e => setData('password_confirmation', e.target.value)} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Package Info Card */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 lg:p-8 relative overflow-hidden mb-6">
-                            {/* Decorative background blur */}
-                            <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+                        {/* BLOCK 2 & 3: Pembayaran & Promo (Hanya jika Berbayar) */}
+                        {selectedPackage && priceNum > 0 && (
+                            <>
+                                <div className="bg-white border border-[var(--line)] rounded-2xl p-7">
+                                    <h3 className="font-display font-semibold text-[16px] flex items-center gap-2 mb-5">
+                                        <span className="w-5 h-5 rounded-full bg-[var(--ink)] text-white font-mono text-[11px] flex items-center justify-center">2</span> Metode Pembayaran
+                                    </h3>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 mb-4">
+                                        <label className={`pay-method ${data.payment_method === 'bank_transfer' ? 'selected' : ''}`}>
+                                            <input type="radio" name="payment" value="bank_transfer" className="hidden" checked={data.payment_method === 'bank_transfer'} onChange={e => setData('payment_method', e.target.value)} />
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 10h18M7 15h.01M11 15h2"/><rect x="2" y="6" width="20" height="12" rx="2"/></svg>
+                                            Transfer VA
+                                        </label>
+                                        <label className={`pay-method ${data.payment_method === 'e_wallet' ? 'selected' : ''}`}>
+                                            <input type="radio" name="payment" value="e_wallet" className="hidden" checked={data.payment_method === 'e_wallet'} onChange={e => setData('payment_method', e.target.value)} />
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                                            E-Wallet/QRIS
+                                        </label>
+                                        <label className={`pay-method ${data.payment_method === 'credit_card' ? 'selected' : ''}`}>
+                                            <input type="radio" name="payment" value="credit_card" className="hidden" checked={data.payment_method === 'credit_card'} onChange={e => setData('payment_method', e.target.value)} />
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                                            Kartu Kredit
+                                        </label>
+                                    </div>
+                                    <p className="text-[11.5px] text-[var(--slate-light)]">Instruksi pembayaran akan dikirimkan ke email Anda setelah mendaftar.</p>
+                                </div>
 
-                            {selectedPackage && selectedPackage.price > '0' && (
-                                <div className="inline-block bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
-                                    Paket Terpilih
+                                <div className="bg-white border border-[var(--line)] rounded-2xl p-7">
+                                    <h3 className="font-display font-semibold text-[16px] flex items-center gap-2 mb-4">
+                                        <span className="w-5 h-5 rounded-full bg-[var(--ink)] text-white font-mono text-[11px] flex items-center justify-center">3</span> Kode Promo
+                                    </h3>
+                                    
+                                    <div className="flex gap-2.5">
+                                        <input type="text" className="field-input uppercase flex-grow" placeholder="Masukkan kode promo..." value={data.promo_code} onChange={e => setData('promo_code', e.target.value)} disabled={appliedPromo !== null} />
+                                        <button type="button" onClick={handleApplyPromo} className="bg-[var(--ink)] text-white px-5 rounded-lg text-[13.5px] font-semibold hover:bg-[var(--ink-soft)] transition-colors shrink-0 disabled:opacity-50" disabled={!data.promo_code || appliedPromo !== null}>
+                                            Terapkan
+                                        </button>
+                                    </div>
+                                    {appliedPromo && (
+                                        <div className="flex items-center gap-1.5 mt-3 text-[12.5px] font-semibold text-[var(--moss)]">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                            Kode promo {appliedPromo.code} berhasil diterapkan!
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-2.5 text-[12.5px] text-[var(--slate-light)] pt-4 mt-4 border-t border-[var(--line-light)]">
+                                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" className="w-[15px] h-[15px] stroke-[var(--moss)] shrink-0"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+                                        Pendaftaran dienkripsi end-to-end dengan aman.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        
+                        {/* Tombol Register Mobile (Akan disembunyikan di Desktop dan pindah ke Summary Card) */}
+                        <div className="lg:hidden mt-6">
+                            <button type="submit" disabled={processing} className="btn-amber">
+                                {processing ? 'Memproses...' : (selectedPackage && priceNum > 0 ? 'Mulai Langganan' : 'Daftar & Mulai Trial')}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {/* --- BAGIAN KANAN (SUMMARY CARD) --- */}
+                <div className="bg-[var(--ink)] text-[var(--paper)] rounded-[18px] p-8 lg:sticky lg:top-[96px] shadow-[0_30px_60px_-24px_rgba(11,17,32,0.4)]">
+                    
+                    {selectedPackage ? (
+                        <>
+                            <div className="flex justify-between items-start pb-5 border-b border-white/10 mb-5">
+                                <div>
+                                    <div className="font-display font-semibold text-[18px] mb-1">{selectedPackage.name}</div>
+                                    <div className="text-[12.5px] text-[var(--slate-light)] max-w-[200px] leading-[1.5]">{selectedPackage.description}</div>
+                                </div>
+                                <span className="font-mono text-[10.5px] bg-[var(--amber)] text-[var(--ink)] px-[9px] py-[3px] rounded-full font-bold uppercase shrink-0">
+                                    {selectedPackage.billing_cycle === 'yearly' ? 'TAHUNAN' : 'BULANAN'}
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between items-center text-[14px] text-[var(--slate-light)] py-2">
+                                <span>Subtotal</span>
+                                <span className="font-mono text-[var(--paper)]">{formatRupiah(priceNum)}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[14px] text-[var(--slate-light)] py-2">
+                                <span>Siklus</span>
+                                <span className="font-mono text-[var(--paper)]">{selectedPackage.billing_cycle === 'yearly' ? 'Tahunan' : 'Bulanan'}</span>
+                            </div>
+                            
+                            {appliedPromo && (
+                                <div className="flex justify-between items-center text-[14px] text-[var(--amber)] py-2 font-medium">
+                                    <span>Diskon ({appliedPromo.code})</span>
+                                    <span className="font-mono">-{formatRupiah(appliedPromo.discount)}</span>
                                 </div>
                             )}
 
-                            <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                                {selectedPackage ? selectedPackage.name : 'Free Trial 14 Hari'}
-                            </h2>
-                            
-                            <div className="flex items-end gap-1 mb-2">
-                                <span className="text-3xl font-extrabold text-blue-600">
-                                    {selectedPackage ? formatRupiah(priceNum) : 'Rp 0'}
+                            <div className="flex justify-between items-baseline pt-4 mt-2 border-t border-white/10">
+                                <span className="text-[14px] font-semibold">Total tagihan</span>
+                                <span className="font-mono text-[26px] font-bold tracking-tight">
+                                    {formatRupiah(totalAmount)}
+                                    <span className="text-[12px] text-[var(--slate-light)] font-sans ml-1 font-normal">/{selectedPackage.billing_cycle === 'yearly' ? 'thn' : 'bln'}</span>
                                 </span>
-                                {selectedPackage && (
-                                    <span className="text-slate-500 font-medium mb-1">
-                                        / {selectedPackage.billing_cycle === 'yearly' ? 'tahun' : selectedPackage.billing_cycle === 'monthly' ? 'bulan' : 'sekali'}
-                                    </span>
-                                )}
                             </div>
-                            <p className="text-sm text-slate-500 mb-6 pb-6 border-b border-slate-100">
-                                {selectedPackage 
-                                    ? selectedPackage.description 
-                                    : "Akses penuh ke seluruh modul sistem informasi akademik."}
-                            </p>
 
-                            <div className="space-y-4">
-                                {/* Base Features */}
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 bg-blue-100 text-blue-600 rounded-full p-0.5 shrink-0">
-                                        <Check className="w-3.5 h-3.5" />
-                                    </div>
-                                    <span className="text-sm text-slate-700 font-medium">
-                                        {selectedPackage ? `Maksimal ${selectedPackage.max_students} Siswa` : 'Kapasitas Tidak Terbatas'}
-                                    </span>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 bg-blue-100 text-blue-600 rounded-full p-0.5 shrink-0">
-                                        <Check className="w-3.5 h-3.5" />
-                                    </div>
-                                    <span className="text-sm text-slate-700 font-medium">
-                                        {selectedPackage ? `Penyimpanan ${(selectedPackage.storage_limit_mb / 1024).toFixed(1)} GB` : 'Penyimpanan Cukup untuk Percobaan'}
-                                    </span>
-                                </div>
-                                {/* Dynamic Features */}
-                                {selectedPackage?.features && Array.isArray(selectedPackage.features) && selectedPackage.features.map((feat: string, idx: number) => (
-                                    <div key={idx} className="flex items-start gap-3">
-                                        <div className="mt-0.5 bg-blue-100 text-blue-600 rounded-full p-0.5 shrink-0">
-                                            <Check className="w-3.5 h-3.5" />
-                                        </div>
-                                        <span className="text-sm text-slate-700 font-medium">{feat}</span>
-                                    </div>
+                            <button onClick={submit} disabled={processing} className="btn-amber mt-7 hidden lg:block">
+                                {processing ? 'Memproses Data...' : 'Mulai Langganan'}
+                            </button>
+
+                            <ul className="mt-6 pt-5 border-t border-white/10 space-y-3">
+                                <li className="flex items-start gap-2.5 text-[13px] text-[var(--slate-light)]">
+                                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" className="w-[14px] h-[14px] stroke-[var(--amber)] shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Maks {selectedPackage.max_students} Siswa
+                                </li>
+                                {selectedPackage.features?.map((feat: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-2.5 text-[13px] text-[var(--slate-light)]">
+                                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" className="w-[14px] h-[14px] stroke-[var(--amber)] shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                        {feat}
+                                    </li>
                                 ))}
-                                {!selectedPackage && (
-                                    <div className="flex items-start gap-3">
-                                        <div className="mt-0.5 bg-blue-100 text-blue-600 rounded-full p-0.5 shrink-0">
-                                            <Check className="w-3.5 h-3.5" />
-                                        </div>
-                                        <span className="text-sm text-slate-700 font-medium">Tanpa Kartu Kredit</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Custom / Contact Sales Banner */}
-                        <div className="bg-[#F8FAFC] rounded-2xl border border-slate-200 p-6 flex items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                                <div className="bg-white p-2 rounded-full border border-slate-200 shrink-0">
-                                    <HelpCircle className="w-5 h-5 text-slate-600" />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-slate-900 mb-1">Butuh kustomisasi?</h4>
-                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                        Kami menyediakan solusi khusus (On-Premise) untuk instansi besar.
-                                    </p>
-                                </div>
-                            </div>
-                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700 whitespace-nowrap hidden sm:block">
-                                Hubungi Sales &rarr;
-                            </Link>
-                        </div>
-
-                        {/* Trust Badges */}
-                        <div className="mt-8 flex items-center justify-between sm:justify-start sm:gap-10 border-t border-slate-200 pt-6">
-                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                                <RotateCcw className="w-4 h-4 text-slate-400" /> Garansi 30-hari
-                            </div>
-                            <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                                <ShieldCheck className="w-4 h-4 text-slate-400" /> Enkripsi Aman
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* --- KOLOM KANAN: FORM PENDAFTARAN & CHECKOUT --- */}
-                    <div className="lg:col-span-7">
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                            <div className="px-6 py-8 sm:p-10">
-                                
-                                <h2 className="text-xl font-bold text-slate-900 mb-2">Checkout Pendaftaran</h2>
-                                <p className="text-sm text-slate-500 mb-8">Masukkan detail institusi dan selesaikan pengaturan.</p>
-
-                                <form onSubmit={submit} className="space-y-8">
-                                    
-                                    {errors.error && (
-                                        <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm font-medium flex items-center gap-2">
-                                            <ShieldCheck className="w-5 h-5" /> {errors.error}
-                                        </div>
-                                    )}
-
-                                    {/* --- INFORMASI INSTITUSI --- */}
-                                    <div className="space-y-5">
-                                        <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">1. Data Institusi</h3>
-                                        
-                                        <div className="space-y-2">
-                                            <Label htmlFor="school_name" className="text-slate-700">Nama Institusi</Label>
-                                            <div className="relative">
-                                                <Building2 className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <Input 
-                                                    id="school_name" 
-                                                    placeholder="Contoh: SMA Negeri 1 Bangsa"
-                                                    value={data.school_name}
-                                                    onChange={(e) => setData('school_name', e.target.value)}
-                                                    className="pl-10 h-11 bg-slate-50/50 focus:bg-white transition-colors"
-                                                />
-                                            </div>
-                                            {errors.school_name && <p className="text-xs text-red-500">{errors.school_name}</p>}
-                                        </div>
-                                    </div>
-
-                                    {/* --- INFORMASI ADMIN --- */}
-                                    <div className="space-y-5">
-                                        <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">2. Akun Administrator</h3>
-                                        
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="name" className="text-slate-700">Nama Lengkap</Label>
-                                                <div className="relative">
-                                                    <User className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <Input 
-                                                        id="name" 
-                                                        placeholder="Nama pengelola"
-                                                        value={data.name}
-                                                        onChange={(e) => setData('name', e.target.value)}
-                                                        className="pl-10 h-11 bg-slate-50/50 focus:bg-white transition-colors"
-                                                    />
-                                                </div>
-                                                {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="email" className="text-slate-700">Alamat Email</Label>
-                                                <div className="relative">
-                                                    <Mail className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <Input 
-                                                        id="email" 
-                                                        type="email" 
-                                                        placeholder="email@institusi.com"
-                                                        value={data.email}
-                                                        onChange={(e) => setData('email', e.target.value)}
-                                                        className="pl-10 h-11 bg-slate-50/50 focus:bg-white transition-colors"
-                                                    />
-                                                </div>
-                                                {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="password" className="text-slate-700">Password</Label>
-                                                <div className="relative">
-                                                    <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <Input 
-                                                        id="password" 
-                                                        type="password" 
-                                                        placeholder="Minimal 8 karakter"
-                                                        value={data.password}
-                                                        onChange={(e) => setData('password', e.target.value)}
-                                                        className="pl-10 h-11 bg-slate-50/50 focus:bg-white transition-colors"
-                                                    />
-                                                </div>
-                                                {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="password_confirmation" className="text-slate-700">Konfirmasi Password</Label>
-                                                <div className="relative">
-                                                    <Lock className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <Input 
-                                                        id="password_confirmation" 
-                                                        type="password" 
-                                                        placeholder="Ulangi password"
-                                                        value={data.password_confirmation}
-                                                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                                                        className="pl-10 h-11 bg-slate-50/50 focus:bg-white transition-colors"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* --- PEMBAYARAN (HANYA JIKA BERBAYAR) --- */}
-                                    {selectedPackage && priceNum > 0 && (
-                                        <div className="space-y-5 pt-2">
-                                            <h3 className="text-sm font-semibold text-slate-900 border-b border-slate-100 pb-2">3. Metode Pembayaran</h3>
-                                            
-                                            {/* Selector Pembayaran mirip Tabs */}
-                                            <div className="flex flex-col sm:flex-row gap-3">
-                                                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 p-3 border rounded-lg transition-all ${data.payment_method === 'bank_transfer' ? 'border-blue-600 bg-blue-50/30 text-blue-700 shadow-[0_0_0_1px_#2563eb]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
-                                                    <input type="radio" name="payment_method" value="bank_transfer" className="sr-only" checked={data.payment_method === 'bank_transfer'} onChange={(e) => setData('payment_method', e.target.value)} />
-                                                    <CreditCard className="w-5 h-5" />
-                                                    <span className="font-semibold text-sm">Transfer / VA</span>
-                                                </label>
-                                                <label className={`flex-1 cursor-pointer flex items-center justify-center gap-2 p-3 border rounded-lg transition-all ${data.payment_method === 'e_wallet' ? 'border-blue-600 bg-blue-50/30 text-blue-700 shadow-[0_0_0_1px_#2563eb]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>
-                                                    <input type="radio" name="payment_method" value="e_wallet" className="sr-only" checked={data.payment_method === 'e_wallet'} onChange={(e) => setData('payment_method', e.target.value)} />
-                                                    <Wallet className="w-5 h-5" />
-                                                    <span className="font-semibold text-sm">QRIS / E-Wallet</span>
-                                                </label>
-                                            </div>
-
-                                            {/* Mock Kode Promo */}
-                                            <div className="space-y-2 mt-4">
-                                                <Label htmlFor="promo" className="text-slate-700">Kode Promo (Opsional)</Label>
-                                                <div className="flex gap-2">
-                                                    <div className="relative flex-1">
-                                                        <Tag className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                        <Input 
-                                                            id="promo" 
-                                                            placeholder="Masukkan kode..."
-                                                            value={data.promo_code}
-                                                            onChange={(e) => setData('promo_code', e.target.value)}
-                                                            className="pl-10 h-11 uppercase bg-slate-50/50 focus:bg-white"
-                                                            disabled={appliedPromo !== null}
-                                                        />
-                                                    </div>
-                                                    <Button type="button" variant="outline" onClick={handleApplyPromo} disabled={!data.promo_code || appliedPromo !== null} className="h-11 px-6">
-                                                        Terapkan
-                                                    </Button>
-                                                </div>
-                                                {appliedPromo && (
-                                                    <p className="text-xs text-emerald-600 font-medium mt-2 flex items-center gap-1">
-                                                        <Check className="w-4 h-4 bg-emerald-100 text-emerald-600 rounded-full p-0.5" /> 
-                                                        Promo diterapkan (- {formatRupiah(appliedPromo.discount)})
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* --- BILLING SUMMARY & SUBMIT --- */}
-                                    <div className="mt-8 pt-6 border-t border-slate-200">
-                                        {selectedPackage ? (
-                                            <div className="space-y-3 mb-6">
-                                                <div className="flex justify-between text-sm text-slate-600">
-                                                    <span>Paket {selectedPackage.name}</span>
-                                                    <span>{formatRupiah(priceNum)}</span>
-                                                </div>
-                                                {appliedPromo && (
-                                                    <div className="flex justify-between text-sm text-emerald-600">
-                                                        <span>Diskon Promo</span>
-                                                        <span>- {formatRupiah(appliedPromo.discount)}</span>
-                                                    </div>
-                                                )}
-                                                <div className="flex justify-between items-center text-lg font-bold text-slate-900 pt-3 border-t border-slate-100">
-                                                    <span>Total Pembayaran</span>
-                                                    <div className="flex flex-col items-end">
-                                                        <span>{formatRupiah(totalAmount)} <span className="text-sm font-normal text-slate-500 uppercase tracking-wide">IDR</span></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex justify-between items-center text-lg font-bold text-slate-900 pt-2 mb-6">
-                                                <span>Total Biaya</span>
-                                                <span className="text-emerald-600">Gratis (Rp 0)</span>
-                                            </div>
-                                        )}
-
-                                        <Button className="w-full h-12 text-base font-bold bg-blue-600 hover:bg-blue-700 shadow-md transition-all" type="submit" disabled={processing}>
-                                            <Lock className="w-4 h-4 mr-2" />
-                                            {processing 
-                                                ? 'Memproses...' 
-                                                : (selectedPackage && priceNum > 0 ? 'Selesaikan Pembayaran' : 'Mulai Free Trial')} 
-                                        </Button>
-                                        
-                                        <p className="text-center text-xs text-slate-500 mt-5 leading-relaxed">
-                                            Dengan mendaftar, Anda menyetujui <a href="#" className="text-blue-600 hover:underline">Ketentuan Layanan</a> dan <a href="#" className="text-blue-600 hover:underline">Kebijakan Privasi</a> kami.
-                                        </p>
-                                    </div>
-
-                                </form>
+                            </ul>
+                        </>
+                    ) : (
+                        <>
+                            <div className="pb-5 border-b border-white/10 mb-5 text-center">
+                                <div className="font-display font-semibold text-[22px] mb-2 text-[var(--amber)]">Free Trial 14 Hari</div>
+                                <div className="text-[13.5px] text-[var(--slate-light)] leading-[1.6]">Coba semua fitur unggulan secara gratis tanpa komitmen.</div>
                             </div>
                             
-                            {/* Form Footer */}
-                            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 text-center text-sm text-slate-600">
-                                Sudah punya akun?{' '}
-                                <Link href="/login" className="text-blue-600 font-semibold hover:underline">
-                                    Masuk ke Dashboard
-                                </Link>
+                            <div className="flex justify-between items-baseline pt-2">
+                                <span className="text-[14px] font-semibold">Total tagihan</span>
+                                <span className="font-mono text-[26px] font-bold tracking-tight text-[var(--moss-light)]">Rp0</span>
                             </div>
 
-                        </div>
-                    </div>
+                            <button onClick={submit} disabled={processing} className="btn-amber mt-7 hidden lg:block">
+                                {processing ? 'Memproses...' : 'Daftar Sekarang'}
+                            </button>
 
+                            <ul className="mt-6 pt-5 border-t border-white/10 space-y-3">
+                                <li className="flex items-start gap-2.5 text-[13px] text-[var(--slate-light)]">
+                                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" className="w-[14px] h-[14px] stroke-[var(--moss-light)] shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Akses Penuh Semua Modul
+                                </li>
+                                <li className="flex items-start gap-2.5 text-[13px] text-[var(--slate-light)]">
+                                    <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" className="w-[14px] h-[14px] stroke-[var(--moss-light)] shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Tanpa Kartu Kredit
+                                </li>
+                            </ul>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

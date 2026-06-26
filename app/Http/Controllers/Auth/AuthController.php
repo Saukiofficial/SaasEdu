@@ -32,7 +32,15 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            // --- PERBARUI BAGIAN INI: Pengecekan Arah Redirect ---
+            $user = Auth::user();
+            
+            if ($user->hasRole('Customer')) {
+                return redirect()->intended('/customer/dashboard');
+            }
+
             return redirect()->intended('/dashboard');
+            // -----------------------------------------------------
         }
 
         return back()->withErrors([
@@ -44,7 +52,6 @@ class AuthController extends Controller
     {
         $selectedPackage = null;
 
-        // Tangkap ID paket dari parameter URL jika ada
         if ($request->has('package_id')) {
             $selectedPackage = SubscriptionPackage::find($request->package_id);
         }
@@ -69,13 +76,11 @@ class AuthController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Buat Tenant (Sekolah) Baru
             $school = School::create([
                 'name' => $request->school_name,
                 'status' => 'active',
             ]);
 
-            // 2. Buat User (Owner Tenant)
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -83,22 +88,15 @@ class AuthController extends Controller
                 'school_id' => $school->id,
             ]);
 
-            // 3. Beri Role Owner ke user tersebut
             $user->assignRole('Owner');
 
-            // 4. Logika Paket & Langganan
             $package = null;
             if ($request->package_id) {
                 $package = SubscriptionPackage::find($request->package_id);
             }
 
             if ($package && $package->price > 0) {
-                // Jika paket berbayar -> Buat Invoice & Set status langganan ke 'pending'
                 $discount = 0;
-                
-                // (Opsional: Logika validasi promo_code bisa ditambahkan di sini nantinya)
-                // if ($request->promo_code === 'DISKON50') { $discount = 50000; }
-
                 $finalAmount = max(0, $package->price - $discount);
 
                 Subscription::create([
@@ -106,7 +104,7 @@ class AuthController extends Controller
                     'plan_name' => $package->name,
                     'start_date' => Carbon::now(),
                     'end_date' => $package->billing_cycle === 'yearly' ? Carbon::now()->addYear() : Carbon::now()->addMonth(),
-                    'status' => 'pending', // Menunggu pembayaran
+                    'status' => 'pending', 
                 ]);
 
                 SubscriptionInvoice::create([
@@ -114,12 +112,11 @@ class AuthController extends Controller
                     'amount' => $finalAmount,
                     'description' => "Tagihan Langganan Paket: " . $package->name,
                     'status' => 'unpaid',
-                    'due_date' => Carbon::now()->addDays(3), // Jatuh tempo 3 hari
+                    'due_date' => Carbon::now()->addDays(3), 
                     'payment_method' => $request->payment_method ?? 'bank_transfer',
                 ]);
 
             } else {
-                // Jika tidak memilih paket, atau memilih paket gratis -> Berikan Free Trial 14 Hari
                 Subscription::create([
                     'school_id' => $school->id,
                     'plan_name' => 'Free Trial',
@@ -133,8 +130,6 @@ class AuthController extends Controller
 
             Auth::login($user);
 
-            // Jika status langganan 'pending', arahkan ke halaman billing/invoice (bisa disesuaikan nanti)
-            // Untuk saat ini, kita arahkan semua ke dashboard terlebih dahulu.
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
