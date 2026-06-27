@@ -14,6 +14,7 @@ interface TenantSetting {
 interface School {
     id: string;
     name: string;
+    subdomain?: string; // Menambahkan properti subdomain
     tenant_setting: TenantSetting | null;
 }
 
@@ -52,19 +53,22 @@ export default function DomainsIndex({ schools }: { schools: any }) {
         });
     };
 
-    // Fungsi simulasi verifikasi DNS (Hanya UI)
+    // Fungsi simulasi verifikasi DNS
     const simulateDnsCheck = (schoolId: string) => {
         setVerifyingDomain(schoolId);
         setTimeout(() => {
             setVerifyingDomain(null);
-            alert("Sistem mendeteksi bahwa CNAME record sudah mengarah ke server AkademiaOS dengan benar.");
+            alert("Sistem mendeteksi bahwa CNAME record sudah mengarah ke server dengan benar.");
         }, 1500);
     };
 
-    // Fungsi untuk menghasilkan subdomain default berdasarkan nama sekolah
-    const generateDefaultSubdomain = (name: string) => {
-        const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-        return `${slug}.akademiaos.com`;
+    // --- PENTING: Pengaturan Domain Utama & Subdomain ---
+    const mainDomain = 'kyysolutions.com';
+
+    const getDefaultDomainUrl = (school: School) => {
+        // Ambil subdomain dari database, jika kosong baru generate darurat dari nama
+        const sub = school.subdomain || school.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return `${sub}.${mainDomain}`;
     };
 
     return (
@@ -116,6 +120,7 @@ export default function DomainsIndex({ schools }: { schools: any }) {
                                 {schoolList.length > 0 ? (
                                     schoolList.map((school: School) => {
                                         const cDomain = school.tenant_setting?.custom_domain;
+                                        const defaultUrl = getDefaultDomainUrl(school);
                                         
                                         return (
                                             <tr key={school.id} className="hover:bg-[#FAF8F3]/50 transition-colors">
@@ -128,9 +133,9 @@ export default function DomainsIndex({ schools }: { schools: any }) {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <a href={`https://${generateDefaultSubdomain(school.name)}`} target="_blank" rel="noreferrer" className="text-sm font-medium text-blue-600 hover:underline flex items-center gap-1.5">
+                                                    <a href={`https://${defaultUrl}`} target="_blank" rel="noreferrer" className="text-sm font-medium text-blue-600 hover:underline flex items-center gap-1.5">
                                                         <Server className="w-3.5 h-3.5 text-blue-400" />
-                                                        {generateDefaultSubdomain(school.name)}
+                                                        {defaultUrl}
                                                     </a>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -210,8 +215,7 @@ export default function DomainsIndex({ schools }: { schools: any }) {
                                     <div>
                                         <h4 className="text-sm font-bold text-blue-800 mb-1">Informasi DNS</h4>
                                         <p className="text-xs text-blue-700 leading-relaxed">
-                                            Pastikan pihak sekolah telah menambahkan CNAME Record pada panel domain mereka yang mengarah ke: <br/>
-                                            <strong className="bg-blue-100 px-1 py-0.5 rounded">router.akademiaos.com</strong>
+                                            Pastikan pihak sekolah telah menambahkan A Record atau CNAME pada panel domain mereka yang mengarah ke IP / Server Anda.
                                         </p>
                                     </div>
                                 </div>
@@ -225,7 +229,7 @@ export default function DomainsIndex({ schools }: { schools: any }) {
                                             value={data.custom_domain}
                                             onChange={e => setData('custom_domain', e.target.value)}
                                             className="w-full pl-9 pr-3 py-2 bg-[#FAF8F3] border border-[#E2DDD0] rounded-md text-sm focus:border-[#B8935F] focus:ring-1 focus:ring-[#B8935F] outline-none transition-colors"
-                                            placeholder="Contoh: sim.sman1jakarta.sch.id"
+                                            placeholder="Contoh: portal.sman1jakarta.sch.id"
                                         />
                                     </div>
                                     {errors.custom_domain && <p className="text-xs text-red-500">{errors.custom_domain}</p>}
