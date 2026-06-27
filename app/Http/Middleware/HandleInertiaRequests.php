@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Models\Language;
+use App\Models\TenantSetting; // Pastikan ini ditambahkan
 use Illuminate\Support\Facades\Schema;
 
 class HandleInertiaRequests extends Middleware
@@ -31,25 +32,21 @@ class HandleInertiaRequests extends Middleware
 
         $userData = null;
         if ($request->user()) {
-            $user = $request->user();
-            // Gunakan loadMissing untuk efisiensi
-            $user->loadMissing(['school.tenantSetting', 'roles']);
+            $user = clone $request->user();
+            $user->loadMissing(['school', 'roles']);
             $userData = $user->toArray();
 
-            // PERBAIKAN MUTLAK: Mencegah Mismatch Key & Tipe Data
-            if (isset($userData['school'])) {
-                // Ambil data setting, entah Laravel merendernya sebagai snake_case atau camelCase
-                $ts = $userData['school']['tenant_setting'] ?? $userData['school']['tenantSetting'] ?? [];
-
-                // Paksa injeksi array tenant_setting dengan struktur yang 100% dipastikan boolean.
-                // Jika data di DB adalah 0 atau "0", filter_var akan mengubahnya menjadi false (mati).
+            // PERBAIKAN FINAL: Ambil langsung dari Database agar 100% akurat
+            if ($user->school_id) {
+                $setting = TenantSetting::where('school_id', $user->school_id)->first();
+                
                 $userData['school']['tenant_setting'] = [
-                    'enable_ppdb' => filter_var($ts['enable_ppdb'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'enable_lms' => filter_var($ts['enable_lms'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'enable_cbt' => filter_var($ts['enable_cbt'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'enable_finance' => filter_var($ts['enable_finance'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'enable_student_affairs' => filter_var($ts['enable_student_affairs'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                    'enable_facilities' => filter_var($ts['enable_facilities'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'enable_ppdb' => $setting ? (bool) $setting->enable_ppdb : true,
+                    'enable_lms' => $setting ? (bool) $setting->enable_lms : true,
+                    'enable_cbt' => $setting ? (bool) $setting->enable_cbt : true,
+                    'enable_finance' => $setting ? (bool) $setting->enable_finance : true,
+                    'enable_student_affairs' => $setting ? (bool) $setting->enable_student_affairs : true,
+                    'enable_facilities' => $setting ? (bool) $setting->enable_facilities : true,
                 ];
             }
         }
