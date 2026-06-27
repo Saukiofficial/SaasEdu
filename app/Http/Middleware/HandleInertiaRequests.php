@@ -29,12 +29,32 @@ class HandleInertiaRequests extends Middleware
             // Abaikan jika tabel belum ada
         }
 
+        // Mencegah Bug JavaScript: Jika Database/SQLite mengembalikan nilai "0" (String), 
+        // JavaScript akan menganggapnya TRUE. Kita harus memaksa konversinya menjadi Boolean asli (false).
+        $userData = null;
+        if ($request->user()) {
+            $user = clone $request->user();
+            $user->load(['school.tenantSetting', 'roles']);
+            $userData = $user->toArray();
+
+            // Pengecekan ketat (Strict Cast)
+            if (isset($userData['school']['tenant_setting'])) {
+                $ts = &$userData['school']['tenant_setting'];
+                $ts['enable_ppdb'] = filter_var($ts['enable_ppdb'] ?? true, FILTER_VALIDATE_BOOLEAN);
+                $ts['enable_lms'] = filter_var($ts['enable_lms'] ?? true, FILTER_VALIDATE_BOOLEAN);
+                $ts['enable_cbt'] = filter_var($ts['enable_cbt'] ?? true, FILTER_VALIDATE_BOOLEAN);
+                $ts['enable_finance'] = filter_var($ts['enable_finance'] ?? true, FILTER_VALIDATE_BOOLEAN);
+                $ts['enable_student_affairs'] = filter_var($ts['enable_student_affairs'] ?? true, FILTER_VALIDATE_BOOLEAN);
+                $ts['enable_facilities'] = filter_var($ts['enable_facilities'] ?? true, FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+
         return [
             ...parent::share($request),
             
-            // PERBARUI BAGIAN INI: Load relasi 'roles' dan 'school.tenantSetting'
+            // PERBARUI BAGIAN INI: Mengirimkan data yang sudah dipastikan tipe booleannya
             'auth' => [
-                'user' => $request->user() ? $request->user()->load(['school.tenantSetting', 'roles']) : null,
+                'user' => $userData,
             ],
             
             'flash' => [
