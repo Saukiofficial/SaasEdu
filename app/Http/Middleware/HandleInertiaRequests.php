@@ -34,7 +34,7 @@ class HandleInertiaRequests extends Middleware
             
             // PERBARUI BAGIAN INI: Load relasi 'roles' dan 'school.tenantSetting'
             'auth' => [
-                'user' => $request->user() ? $request->user()->load(['roles', 'school.tenantSetting']) : null,
+                'user' => $request->user() ? $request->user()->load(['school.tenantSetting', 'roles']) : null,
             ],
             
             'flash' => [
