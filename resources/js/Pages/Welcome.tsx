@@ -51,7 +51,7 @@ export default function Welcome({ landingData, packages, blogs, products, source
                 body.appendChild(div);
 
                 if(line.type === "cmd"){
-                    div.innerHTML = '<span class="prompt">naim@akademiaso</span><span class="path">:~$</span> ';
+                    div.innerHTML = '<span class="prompt">kyysolutions@akademiaso</span><span class="path">:~$</span> ';
                     const span = document.createElement("span");
                     div.appendChild(span);
                     await typeText(span, line.text, 28);
@@ -65,7 +65,7 @@ export default function Welcome({ landingData, packages, blogs, products, source
             if (!isRunning) return;
             const cursorLine = document.createElement("div");
             cursorLine.className = "terminal-line";
-            cursorLine.innerHTML = '<span class="prompt">naim@akademiaso</span><span class="path">:~$</span> <span class="cursor"></span>';
+            cursorLine.innerHTML = '<span class="prompt">kyysolutions@akademiaso</span><span class="path">:~$</span> <span class="cursor"></span>';
             body.appendChild(cursorLine);
 
             await sleep(2600);
