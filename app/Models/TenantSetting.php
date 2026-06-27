@@ -19,6 +19,8 @@ class TenantSetting extends Model
         'enable_ppdb',
         'enable_lms',
         'enable_finance',
+        'enable_student_affairs',
+        'enable_facilities',
     ];
 
     protected $casts = [
@@ -26,6 +28,8 @@ class TenantSetting extends Model
         'enable_ppdb' => 'boolean',
         'enable_lms' => 'boolean',
         'enable_finance' => 'boolean',
+        'enable_student_affairs' => 'boolean', // Tambahan baru
+        'enable_facilities' => 'boolean',
     ];
 
     // Relasi ke model School (Pastikan model School Anda sudah ada)

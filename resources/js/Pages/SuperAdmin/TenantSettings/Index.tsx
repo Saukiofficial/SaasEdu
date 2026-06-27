@@ -14,6 +14,8 @@ interface TenantSetting {
     enable_ppdb: boolean;
     enable_lms: boolean;
     enable_finance: boolean;
+    enable_student_affairs: boolean; // Diperbaiki menjadi boolean
+    enable_facilities: boolean;      // Diperbaiki menjadi boolean
 }
 
 interface School {
@@ -38,6 +40,8 @@ export default function TenantSettingsIndex({ schools }: { schools: any }) {
         enable_ppdb: true,
         enable_lms: true,
         enable_finance: true,
+        enable_student_affairs: true,
+        enable_facilities: true,
     });
 
     // Buka Modal Edit
@@ -53,6 +57,8 @@ export default function TenantSettingsIndex({ schools }: { schools: any }) {
             enable_ppdb: settings ? settings.enable_ppdb : true,
             enable_lms: settings ? settings.enable_lms : true,
             enable_finance: settings ? settings.enable_finance : true,
+            enable_student_affairs: settings ? settings.enable_student_affairs : true,
+            enable_facilities: settings ? settings.enable_facilities : true,
         });
         
         setIsModalOpen(true);
@@ -172,6 +178,8 @@ export default function TenantSettingsIndex({ schools }: { schools: any }) {
                                                         {(!sets || sets.enable_ppdb) && <span className="px-2 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-bold rounded border border-purple-200">PPDB</span>}
                                                         {(!sets || sets.enable_lms) && <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded border border-emerald-200">LMS</span>}
                                                         {(!sets || sets.enable_finance) && <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded border border-amber-200">Keuangan</span>}
+                                                        {(!sets || sets.enable_student_affairs) && <span className="px-2 py-0.5 bg-rose-50 text-rose-700 text-[10px] font-bold rounded border border-rose-200">Kesiswaan</span>}
+                                                        {(!sets || sets.enable_facilities) && <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded border border-indigo-200">Fasilitas</span>}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
@@ -299,6 +307,16 @@ export default function TenantSettingsIndex({ schools }: { schools: any }) {
                                             label="Modul Tagihan & Keuangan" 
                                             isEnabled={data.enable_finance} 
                                             onChange={() => setData('enable_finance', !data.enable_finance)} 
+                                        />
+                                        <ToggleSwitch 
+                                            label="Modul Kesiswaan (BK, Prestasi)" 
+                                            isEnabled={data.enable_student_affairs} 
+                                            onChange={() => setData('enable_student_affairs', !data.enable_student_affairs)} 
+                                        />
+                                        <ToggleSwitch 
+                                            label="Modul Fasilitas (Perpus, Sarpras)" 
+                                            isEnabled={data.enable_facilities} 
+                                            onChange={() => setData('enable_facilities', !data.enable_facilities)} 
                                         />
                                     </div>
                                     <p className="text-[10px] text-[#8B93A8] mt-3 bg-amber-50 text-amber-700 p-2 rounded-md border border-amber-200">

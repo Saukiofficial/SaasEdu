@@ -32,9 +32,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             
-            // PERBARUI BAGIAN INI: Load relasi 'roles' dan 'school'
+            // PERBARUI BAGIAN INI: Load relasi 'roles' dan 'school.tenantSetting'
             'auth' => [
-                'user' => $request->user() ? $request->user()->load(['school', 'roles']) : null,
+                'user' => $request->user() ? $request->user()->load(['roles', 'school.tenantSetting']) : null,
             ],
             
             'flash' => [

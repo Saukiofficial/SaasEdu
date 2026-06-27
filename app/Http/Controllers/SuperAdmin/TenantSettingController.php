@@ -35,6 +35,8 @@ class TenantSettingController extends Controller
             'enable_ppdb' => 'required|boolean',
             'enable_lms' => 'required|boolean',
             'enable_finance' => 'required|boolean',
+            'enable_student_affairs' => 'required|boolean', // Tambahan baru
+            'enable_facilities' => 'required|boolean', //
         ]);
 
         $this->tenantSettingService->applySettings($schoolId, $validated);
